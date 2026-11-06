@@ -1,0 +1,28 @@
+# Dependencias de producción
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic[email]==2.10.0
+pydantic-settings==2.6.1
+email-validator>=2.0.0
+
+# Base de datos
+sqlalchemy==2.0.36
+alembic==1.14.0
+asyncpg==0.30.0
+
+# Seguridad
+bcrypt==4.2.1
+pyjwt==2.10.1
+cryptography==44.0.0
+
+# Redis
+redis==5.2.0
+
+# Worker
+apscheduler==3.10.4
+
+# HTTP (para push/correo reales)
+httpx==0.28.0
+
+# Emails
+aiosmtplib==3.0.2

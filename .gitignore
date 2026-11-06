@@ -1,0 +1,40 @@
+# Entornos virtuales y Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Secretos y variables de entorno reales
+.env
+.env.local
+.env.production
+*.pem
+*.key
+
+# Bases de datos y almacenamiento local
+*.sqlite3
+*.db
+pgdata/
+redisdata/
+
+# Testing y cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDEs y SO
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Artefactos y reportes temporales
+scratch/
+audit_report/
+*.log
