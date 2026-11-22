@@ -1,0 +1,93 @@
+name: CI - AboGator Backend
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Typecheck (Ruff & Mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Ejecutar Ruff (Linter y Formato)
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Ejecutar Mypy (Tipado Estricto)
+        run: |
+          mypy app
+
+  tests:
+    name: Pruebas y Cobertura
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: abogator
+          POSTGRES_PASSWORD: abogator
+          POSTGRES_DB: abogator_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://abogator:abogator@localhost:5432/abogator_test
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: test-jwt-secret-ci-testing-key-32chars
+      PAQUETE_SECRET: test-paquete-secret-ci-testing-key
+      API_BASE_URL: http://localhost:8000
+      ADMIN_EMAIL: admin@abogator.local
+      ADMIN_PASSWORD: AdminTestPassword123
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Ejecutar Migraciones Alembic
+        run: |
+          alembic upgrade head
+
+      - name: Ejecutar Pytest con Cobertura
+        run: |
+          pytest --cov=app --cov-report=xml --cov-report=term-missing
