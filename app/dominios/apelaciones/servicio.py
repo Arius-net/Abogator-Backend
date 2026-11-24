@@ -205,7 +205,9 @@ class ApelacionesServicio:
             resultado=resultado_str,
             vida_recuperada=vida_recuperada,
             etapa=apelacion.etapa,
-            proxima_revision=apelacion.proxima_revision if apelacion.estado == EstadoApelacion.pendiente else None,
+            proxima_revision=apelacion.proxima_revision
+            if apelacion.estado == EstadoApelacion.pendiente
+            else None,
             estado=apelacion.estado.value,
             vidas=vidas_finales,
         )

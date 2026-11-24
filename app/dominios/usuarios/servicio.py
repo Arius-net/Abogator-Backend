@@ -34,7 +34,6 @@ class UsuariosServicio:
         self._s = sesion
         self._repo = UsuariosRepositorio(sesion)
 
-
     async def obtener_usuario(self, usuario_id: uuid.UUID) -> UsuarioRespuesta:
         usuario = await self._repo.buscar_por_id(usuario_id)
         if usuario is None:
@@ -52,6 +51,7 @@ class UsuariosServicio:
             usuario.nombre = datos.nombre
         if datos.perfil is not None:
             from app.modelos.enums import PerfilUsuario
+
             usuario.perfil = PerfilUsuario(datos.perfil)
         if datos.zona_horaria is not None:
             usuario.zona_horaria = datos.zona_horaria
@@ -59,7 +59,6 @@ class UsuariosServicio:
         await self._s.commit()
         await self._s.refresh(usuario)
         return UsuarioRespuesta.model_validate(usuario)
-
 
     async def estado_usuario(self, usuario_id: uuid.UUID) -> EstadoRespuesta:
         """Calcula lazy regen de vidas (05 §5) sin escribir a BD."""
@@ -76,9 +75,7 @@ class UsuariosServicio:
         proxima_vida_en = None
         if vidas_efectivas < cfg.VIDAS_MAX:
             residuo_s = delta_s % cfg.VIDA_REGEN_SEGUNDOS
-            proxima_vida_en = ahora + timedelta(
-                seconds=cfg.VIDA_REGEN_SEGUNDOS - residuo_s
-            )
+            proxima_vida_en = ahora + timedelta(seconds=cfg.VIDA_REGEN_SEGUNDOS - residuo_s)
 
         return EstadoRespuesta(
             vidas=vidas_efectivas,
@@ -91,7 +88,6 @@ class UsuariosServicio:
             amparo_activo=usuario.amparo_activo,
         )
 
-
     async def guardar_preferencias(
         self, usuario_id: uuid.UUID, prefs: Preferencias
     ) -> Preferencias:
@@ -101,7 +97,6 @@ class UsuariosServicio:
         usuario.preferencias = prefs.model_dump()
         await self._s.commit()
         return prefs
-
 
     async def registrar_dispositivo(
         self, usuario_id: uuid.UUID, plataforma: str, token: str
@@ -120,7 +115,6 @@ class UsuariosServicio:
             plataforma=dispositivo.plataforma,
             activo=dispositivo.activo,
         )
-
 
     async def exportar_datos(self, usuario_id: uuid.UUID) -> DatosPersonalesRespuesta:
         usuario = await self._repo.buscar_por_id(usuario_id)
@@ -157,7 +151,6 @@ class UsuariosServicio:
             ],
         )
 
-
     async def solicitar_borrado(self, usuario_id: uuid.UUID) -> None:
         """
         Marca la cuenta como pendiente_borrado y revoca todas las sesiones.
@@ -177,7 +170,6 @@ class UsuariosServicio:
         await auth_repo.revocar_todas_sesiones_usuario(usuario_id, ahora)
         await self._s.commit()
 
-
     async def inventario_usuario(self, usuario_id: uuid.UUID) -> InventarioRespuesta:
         usuario = await self._repo.buscar_por_id(usuario_id)
         if usuario is None:
@@ -185,13 +177,10 @@ class UsuariosServicio:
         inv = Inventario.model_validate(usuario.inventario)
         return InventarioRespuesta(inventario=inv)
 
-
     async def listar_movimientos(
         self, usuario_id: uuid.UUID, pagina: int, por_pagina: int
     ) -> MovimientosPaginados:
-        items, total = await self._repo.listar_movimientos(
-            usuario_id, pagina, por_pagina
-        )
+        items, total = await self._repo.listar_movimientos(usuario_id, pagina, por_pagina)
         return MovimientosPaginados(
             items=[
                 MovimientoRespuesta(
@@ -210,7 +199,6 @@ class UsuariosServicio:
             por_pagina=por_pagina,
         )
 
-
     async def perfil_estadisticas(self, usuario_id: uuid.UUID) -> PerfilRespuesta:
         """
         Calcula estadísticas de perfil a partir de intentos y progreso.
@@ -226,13 +214,10 @@ class UsuariosServicio:
         if usuario is None:
             raise NoEncontrado()
 
-        q_sum = (
-            select(
-                func.coalesce(func.sum(Intento.aciertos), 0),
-                func.coalesce(func.sum(Intento.aciertos + Intento.parciales + Intento.errores), 0),
-            )
-            .where(Intento.usuario_id == usuario_id)
-        )
+        q_sum = select(
+            func.coalesce(func.sum(Intento.aciertos), 0),
+            func.coalesce(func.sum(Intento.aciertos + Intento.parciales + Intento.errores), 0),
+        ).where(Intento.usuario_id == usuario_id)
         res_sum = await self._s.execute(q_sum)
         aciertos_int, total_int = res_sum.one()
         precision = (aciertos_int / total_int * 100.0) if total_int > 0 else 0.0
@@ -256,7 +241,6 @@ class UsuariosServicio:
             progreso_modulos=[],
         )
 
-
     async def listar_insignias(self, usuario_id: uuid.UUID) -> list[InsigniaRespuesta]:
         todas = await self._repo.listar_insignias_todas()
         obtenidas = await self._repo.listar_insignias_usuario(usuario_id)
@@ -277,10 +261,7 @@ class UsuariosServicio:
             )
         return result
 
-
-    async def listar_certificados(
-        self, usuario_id: uuid.UUID
-    ) -> list[CertificadoRespuesta]:
+    async def listar_certificados(self, usuario_id: uuid.UUID) -> list[CertificadoRespuesta]:
         certs = await self._repo.listar_certificados(usuario_id)
         result = []
         for cert in certs:
@@ -294,7 +275,6 @@ class UsuariosServicio:
                 )
             )
         return result
-
 
     async def reto_hoy(self, usuario_id: uuid.UUID) -> RetoRespuesta:
         """

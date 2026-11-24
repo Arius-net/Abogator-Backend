@@ -81,7 +81,9 @@ async def usar_comodin(
     return await JuegoServicio(sesion).usar_comodin(_uid(payload), id, datos)
 
 
-@router.post("/examenes/{sprint_id}/intentos", response_model=IniciarExamenRespuesta, status_code=201)
+@router.post(
+    "/examenes/{sprint_id}/intentos", response_model=IniciarExamenRespuesta, status_code=201
+)
 async def iniciar_examen(
     sprint_id: int,
     payload: UsuarioActual,

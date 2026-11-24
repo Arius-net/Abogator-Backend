@@ -18,6 +18,7 @@ def get_redis() -> Any:
     if _redis is None:
         if aioredis is None:
             from unittest.mock import AsyncMock
+
             return AsyncMock()
         cfg = get_config()
         _redis = aioredis.from_url(

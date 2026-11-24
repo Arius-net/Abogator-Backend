@@ -42,9 +42,7 @@ async def crear_superadmin() -> None:
 
     async with factory() as sesion:
         sesion: AsyncSession
-        existente = await sesion.scalar(
-            select(Usuario).where(Usuario.correo == cfg.ADMIN_EMAIL)
-        )
+        existente = await sesion.scalar(select(Usuario).where(Usuario.correo == cfg.ADMIN_EMAIL))
         if existente:
             print(f"El usuario {cfg.ADMIN_EMAIL} ya existe. Nada que hacer.")
             await engine.dispose()
@@ -55,6 +53,7 @@ async def crear_superadmin() -> None:
 
         ahora = now()
         import math
+
         dia_del_año = ahora.timetuple().tm_yday
         tipos = [
             "aciertos_seguidos",

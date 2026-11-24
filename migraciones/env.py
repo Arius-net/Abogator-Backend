@@ -1,6 +1,3 @@
-# migraciones/env.py
-# Configuración de Alembic para migraciones async con asyncpg.
-
 from __future__ import annotations
 
 import asyncio
@@ -11,9 +8,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlalchemy import pool
 
 from app.core.config import get_config
-from app.modelos import Base  # importa todos los modelos
+from app.modelos import Base
 
-# ── Config de Alembic ─────────────────────────────────────────────────────────
 config = context.config
 if config.config_file_name:
     fileConfig(config.config_file_name)
@@ -24,8 +20,6 @@ target_metadata = Base.metadata
 def get_url() -> str:
     return get_config().DATABASE_URL
 
-
-# ── Modo offline (sin conexión) ───────────────────────────────────────────────
 
 def run_migrations_offline() -> None:
     context.configure(
@@ -39,9 +33,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-# ── Modo online (con conexión async) ─────────────────────────────────────────
-
-def do_run_migrations(connection) -> None:  # type: ignore[no-untyped-def]
+def do_run_migrations(connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,

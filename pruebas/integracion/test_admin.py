@@ -39,10 +39,34 @@ def override_admin_auth():
 def _crear_contenido_interactivo_dict() -> dict:
     return {
         "veredictos": {
-            "legal": {"resultado": "incorrecto", "d_presupuesto": 0, "d_reputacion": -5, "d_velocidad": 10, "d_riesgo": 25},
-            "ilegal": {"resultado": "correcto", "d_presupuesto": -5, "d_reputacion": 5, "d_velocidad": -10, "d_riesgo": -20},
-            "condicional": {"resultado": "parcial", "d_presupuesto": 0, "d_reputacion": 0, "d_velocidad": 0, "d_riesgo": 5},
-            "escalar": {"resultado": "incorrecto", "d_presupuesto": -10, "d_reputacion": 0, "d_velocidad": -5, "d_riesgo": 0},
+            "legal": {
+                "resultado": "incorrecto",
+                "d_presupuesto": 0,
+                "d_reputacion": -5,
+                "d_velocidad": 10,
+                "d_riesgo": 25,
+            },
+            "ilegal": {
+                "resultado": "correcto",
+                "d_presupuesto": -5,
+                "d_reputacion": 5,
+                "d_velocidad": -10,
+                "d_riesgo": -20,
+            },
+            "condicional": {
+                "resultado": "parcial",
+                "d_presupuesto": 0,
+                "d_reputacion": 0,
+                "d_velocidad": 0,
+                "d_riesgo": 5,
+            },
+            "escalar": {
+                "resultado": "incorrecto",
+                "d_presupuesto": -10,
+                "d_reputacion": 0,
+                "d_velocidad": -5,
+                "d_riesgo": 0,
+            },
         },
         "evidencia": None,
         "micro_pregunta": {
@@ -85,9 +109,7 @@ class TestAdminEndpoints:
             activa=True,
             actualizado_en=now(),
         )
-        with patch.object(
-            AdminServicio, "listar_tarjetas", new_callable=AsyncMock
-        ) as m_list:
+        with patch.object(AdminServicio, "listar_tarjetas", new_callable=AsyncMock) as m_list:
             m_list.return_value = [tarjeta_mock]
             resp = client.get("/v1/admin/tarjetas")
 
@@ -113,9 +135,7 @@ class TestAdminEndpoints:
             activa=False,
             actualizado_en=now(),
         )
-        with patch.object(
-            AdminServicio, "crear_tarjeta", new_callable=AsyncMock
-        ) as m_crear:
+        with patch.object(AdminServicio, "crear_tarjeta", new_callable=AsyncMock) as m_crear:
             m_crear.return_value = tarjeta_mock
             payload = {
                 "sprint_id": 1,
@@ -154,9 +174,7 @@ class TestAdminEndpoints:
             activa=True,
             actualizado_en=now(),
         )
-        with patch.object(
-            AdminServicio, "cambiar_estado_tarjeta", new_callable=AsyncMock
-        ) as m_est:
+        with patch.object(AdminServicio, "cambiar_estado_tarjeta", new_callable=AsyncMock) as m_est:
             m_est.return_value = tarjeta_mock
             resp = client.patch(
                 f"/v1/admin/tarjetas/{tarjeta_id}/estado",
@@ -175,9 +193,7 @@ class TestAdminEndpoints:
             permitido_en_examen=False,
             activo=True,
         )
-        with patch.object(
-            AdminServicio, "actualizar_comodin", new_callable=AsyncMock
-        ) as m_com:
+        with patch.object(AdminServicio, "actualizar_comodin", new_callable=AsyncMock) as m_com:
             m_com.return_value = com_mock
             resp = client.put(
                 "/v1/admin/comodines/lupa",
@@ -189,13 +205,13 @@ class TestAdminEndpoints:
 
     def test_metricas_admin(self) -> None:
         met_mock = MetricasAdminRespuesta(
-            tasa_acierto_tarjetas=[{"tarjeta_id": str(uuid.uuid4()), "total": 10, "tasa_acierto": 80.0}],
+            tasa_acierto_tarjetas=[
+                {"tarjeta_id": str(uuid.uuid4()), "total": 10, "tasa_acierto": 80.0}
+            ],
             quiebras_por_sprint=[{"sprint_id": 1, "quiebras": 2}],
             retencion_apelaciones={"tasa_retencion": 0.0, "total_apelaciones": 0},
         )
-        with patch.object(
-            AdminServicio, "metricas", new_callable=AsyncMock
-        ) as m_met:
+        with patch.object(AdminServicio, "metricas", new_callable=AsyncMock) as m_met:
             m_met.return_value = met_mock
             resp = client.get("/v1/admin/metricas")
 
@@ -229,16 +245,17 @@ class TestInmutabilidadTarjetaReglaDos:
             actualizado_en=now(),
         )
 
-        with patch.object(
-            servicio._repo, "buscar_tarjeta_por_id", new_callable=AsyncMock
-        ) as m_buscar, patch.object(
-            servicio._repo, "crear_tarjeta", new_callable=AsyncMock
-        ) as m_crear, patch.object(
-            servicio._repo, "registrar_auditoria", new_callable=AsyncMock
-        ) as m_audit:
+        with (
+            patch.object(
+                servicio._repo, "buscar_tarjeta_por_id", new_callable=AsyncMock
+            ) as m_buscar,
+            patch.object(servicio._repo, "crear_tarjeta", new_callable=AsyncMock) as m_crear,
+            patch.object(servicio._repo, "registrar_auditoria", new_callable=AsyncMock) as m_audit,
+        ):
             m_buscar.return_value = tarjeta_vieja
 
             from app.esquemas.admin import EditarTarjetaInput
+
             datos = EditarTarjetaInput(texto="Texto v2 editado")
 
             res = await servicio.editar_tarjeta(ADMIN_ID_TEST, id_vieja, datos)
@@ -288,6 +305,7 @@ class TestInmutabilidadTarjetaReglaDos:
             m_buscar.return_value = tarjeta_inactiva
 
             from app.esquemas.admin import EditarTarjetaInput
+
             datos = EditarTarjetaInput(texto="Texto v2")
 
             with pytest.raises(PeticionInvalida):

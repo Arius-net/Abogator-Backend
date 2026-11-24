@@ -44,9 +44,7 @@ class ContenidoRepositorio:
         )
         return list(res.scalars())
 
-    async def listar_todos_progresos_usuario(
-        self, usuario_id: uuid.UUID
-    ) -> list[ProgresoSprint]:
+    async def listar_todos_progresos_usuario(self, usuario_id: uuid.UUID) -> list[ProgresoSprint]:
         res = await self._s.execute(
             select(ProgresoSprint).where(ProgresoSprint.usuario_id == usuario_id)
         )

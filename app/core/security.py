@@ -15,7 +15,6 @@ from app.core.config import get_config
 from app.core.reloj import now
 
 
-
 BCRYPT_ROUNDS = 12
 
 
@@ -27,7 +26,6 @@ def hashear_contrasena(contrasena: str) -> str:
 def verificar_contrasena(contrasena: str, hash_guardado: str) -> bool:
     """Compara la contraseña con el hash almacenado."""
     return bcrypt.checkpw(contrasena.encode(), hash_guardado.encode())
-
 
 
 def crear_access_token(
@@ -50,7 +48,6 @@ def decodificar_access_token(token: str) -> dict[str, Any]:
     return jwt.decode(token, cfg.JWT_SECRET, algorithms=["HS256"])
 
 
-
 def generar_refresh_token() -> str:
     """Genera 32 bytes aleatorios en hex (64 caracteres). Se devuelve al cliente."""
     return secrets.token_hex(32)
@@ -59,7 +56,6 @@ def generar_refresh_token() -> str:
 def hashear_token(token: str) -> str:
     """SHA-256 del token. Es lo que se guarda en la base de datos."""
     return hashlib.sha256(token.encode()).hexdigest()
-
 
 
 def _clave_intento(intento_id: str) -> bytes:
@@ -108,4 +104,5 @@ def descifrar_resolucion(
 def clave_intento_b64(intento_id: str) -> str:
     """Devuelve la clave del intento en base64 (para incluirla en el paquete)."""
     import base64
+
     return base64.b64encode(_clave_intento(intento_id)).decode()

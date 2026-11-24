@@ -98,9 +98,7 @@ class TestContenidoEndpoints:
             ini_riesgo=25,
             monedas_max=60,
         )
-        with patch.object(
-            ContenidoServicio, "detalle_sprint", new_callable=AsyncMock
-        ) as m_det:
+        with patch.object(ContenidoServicio, "detalle_sprint", new_callable=AsyncMock) as m_det:
             m_det.return_value = mock_intro
             resp = client.get("/v1/sprints/1")
 

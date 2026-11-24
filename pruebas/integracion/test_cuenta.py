@@ -50,6 +50,7 @@ def override_usuario_autenticado():
 
 # ── Tests de Endpoints HTTP (/v1/me) ──────────────────────────────────────────
 
+
 class TestEndpointsCuenta:
     def test_obtener_me_exitoso(self) -> None:
         usr_mock = UsuarioRespuesta(
@@ -68,9 +69,7 @@ class TestEndpointsCuenta:
             creado_en=now(),
             ultimo_acceso=now(),
         )
-        with patch.object(
-            UsuariosServicio, "obtener_usuario", new_callable=AsyncMock
-        ) as m_get:
+        with patch.object(UsuariosServicio, "obtener_usuario", new_callable=AsyncMock) as m_get:
             m_get.return_value = usr_mock
             resp = client.get("/v1/me")
 
@@ -97,9 +96,7 @@ class TestEndpointsCuenta:
             creado_en=now(),
             ultimo_acceso=now(),
         )
-        with patch.object(
-            UsuariosServicio, "actualizar_cuenta", new_callable=AsyncMock
-        ) as m_upd:
+        with patch.object(UsuariosServicio, "actualizar_cuenta", new_callable=AsyncMock) as m_upd:
             m_upd.return_value = usr_mock
             resp = client.patch(
                 "/v1/me",
@@ -125,9 +122,7 @@ class TestEndpointsCuenta:
             racha_actual=3,
             amparo_activo=False,
         )
-        with patch.object(
-            UsuariosServicio, "estado_usuario", new_callable=AsyncMock
-        ) as m_est:
+        with patch.object(UsuariosServicio, "estado_usuario", new_callable=AsyncMock) as m_est:
             m_est.return_value = estado_mock
             resp = client.get("/v1/me/estado")
 
@@ -203,9 +198,7 @@ class TestEndpointsCuenta:
             ],
             dispositivos_push=[],
         )
-        with patch.object(
-            UsuariosServicio, "exportar_datos", new_callable=AsyncMock
-        ) as m_arco:
+        with patch.object(UsuariosServicio, "exportar_datos", new_callable=AsyncMock) as m_arco:
             m_arco.return_value = datos_mock
             resp = client.get("/v1/me/datos")
 
@@ -216,9 +209,7 @@ class TestEndpointsCuenta:
 
     def test_borrar_cuenta_soft_delete_endpoint(self) -> None:
         """Endpoint DELETE /me retorna 204 No Content."""
-        with patch.object(
-            UsuariosServicio, "solicitar_borrado", new_callable=AsyncMock
-        ) as m_del:
+        with patch.object(UsuariosServicio, "solicitar_borrado", new_callable=AsyncMock) as m_del:
             m_del.return_value = None
             resp = client.delete("/v1/me")
 
@@ -227,9 +218,7 @@ class TestEndpointsCuenta:
 
     def test_inventario_usuario(self) -> None:
         inv_mock = InventarioRespuesta(inventario=Inventario(lupa=2, abogado=1))
-        with patch.object(
-            UsuariosServicio, "inventario_usuario", new_callable=AsyncMock
-        ) as m_inv:
+        with patch.object(UsuariosServicio, "inventario_usuario", new_callable=AsyncMock) as m_inv:
             m_inv.return_value = inv_mock
             resp = client.get("/v1/me/inventario")
 
@@ -249,9 +238,7 @@ class TestEndpointsCuenta:
             completado=False,
             recompensa_monedas=15,
         )
-        with patch.object(
-            UsuariosServicio, "reto_hoy", new_callable=AsyncMock
-        ) as m_reto:
+        with patch.object(UsuariosServicio, "reto_hoy", new_callable=AsyncMock) as m_reto:
             m_reto.return_value = reto_mock
             resp = client.get("/v1/retos/hoy")
 
@@ -261,6 +248,7 @@ class TestEndpointsCuenta:
 
 
 # ── Tests de Lógica de Negocio y Seguridad (Soft-Delete RG6) ──────────────────
+
 
 class TestSeguridadSoftDelete:
     @pytest.mark.asyncio
@@ -282,12 +270,15 @@ class TestSeguridadSoftDelete:
             eliminado_en=None,
         )
 
-        with patch.object(
-            servicio._repo, "buscar_con_lock", new_callable=AsyncMock
-        ) as m_buscar_lock, patch(
-            "app.dominios.auth.repositorio.AuthRepositorio.revocar_todas_sesiones_usuario",
-            new_callable=AsyncMock,
-        ) as m_revocar_sesiones:
+        with (
+            patch.object(
+                servicio._repo, "buscar_con_lock", new_callable=AsyncMock
+            ) as m_buscar_lock,
+            patch(
+                "app.dominios.auth.repositorio.AuthRepositorio.revocar_todas_sesiones_usuario",
+                new_callable=AsyncMock,
+            ) as m_revocar_sesiones,
+        ):
             m_buscar_lock.return_value = usuario
 
             await servicio.solicitar_borrado(USUARIO_ID_TEST)

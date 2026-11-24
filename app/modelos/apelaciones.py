@@ -34,9 +34,7 @@ if TYPE_CHECKING:
 class Apelacion(Base):
     __tablename__ = "apelaciones"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )
@@ -48,9 +46,7 @@ class Apelacion(Base):
         UUID(as_uuid=True), ForeignKey("respuestas.id"), nullable=True
     )
     etapa: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=1)
-    proxima_revision: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    proxima_revision: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     estado: Mapped[EstadoApelacion] = mapped_column(
         SAEnum(EstadoApelacion, name="estado_apelacion", create_type=False),
         nullable=False,
@@ -60,12 +56,8 @@ class Apelacion(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario", back_populates="apelaciones", lazy="raise"
-    )
-    tarjeta: Mapped["Tarjeta"] = relationship(
-        "Tarjeta", back_populates="apelaciones", lazy="raise"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="apelaciones", lazy="raise")
+    tarjeta: Mapped["Tarjeta"] = relationship("Tarjeta", back_populates="apelaciones", lazy="raise")
     respuesta_origen: Mapped["Respuesta | None"] = relationship(
         "Respuesta", back_populates="apelaciones", lazy="raise"
     )
@@ -105,9 +97,7 @@ class JuicioApelacion(Base):
         SAEnum(ResultadoRespuesta, name="resultado_respuesta", create_type=False),
         nullable=False,
     )
-    vida_recuperada: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False
-    )
+    vida_recuperada: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     resuelto_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
@@ -120,30 +110,20 @@ class JuicioApelacion(Base):
 class Notificacion(Base):
     __tablename__ = "notificaciones"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )
     tipo: Mapped[str] = mapped_column(String(20), nullable=False)
     titulo: Mapped[str] = mapped_column(String(80), nullable=False)
     cuerpo: Mapped[str] = mapped_column(String(200), nullable=False)
-    referencia_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
-    programada_para: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    enviada_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    referencia_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    programada_para: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    enviada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     estado: Mapped[str] = mapped_column(String(12), nullable=False, default="pendiente")
 
     usuario: Mapped["Usuario"] = relationship(
         "Usuario", back_populates="notificaciones", lazy="raise"
     )
 
-    __table_args__ = (
-        Index("ix_notificaciones_estado_programada", "estado", "programada_para"),
-    )
+    __table_args__ = (Index("ix_notificaciones_estado_programada", "estado", "programada_para"),)

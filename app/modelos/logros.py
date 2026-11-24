@@ -51,26 +51,18 @@ class UsuarioInsignia(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario", back_populates="insignias", lazy="raise"
-    )
-    insignia: Mapped["Insignia"] = relationship(
-        "Insignia", back_populates="usuarios", lazy="raise"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="insignias", lazy="raise")
+    insignia: Mapped["Insignia"] = relationship("Insignia", back_populates="usuarios", lazy="raise")
 
 
 class Certificado(Base):
     __tablename__ = "certificados"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )
-    modulo_id: Mapped[int] = mapped_column(
-        SmallInteger, ForeignKey("modulos.id"), nullable=False
-    )
+    modulo_id: Mapped[int] = mapped_column(SmallInteger, ForeignKey("modulos.id"), nullable=False)
     intento_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("intentos.id"), nullable=False
     )
@@ -82,9 +74,7 @@ class Certificado(Base):
     usuario: Mapped["Usuario"] = relationship(
         "Usuario", back_populates="certificados", lazy="raise"
     )
-    modulo: Mapped["Modulo"] = relationship(
-        "Modulo", back_populates="certificados", lazy="raise"
-    )
+    modulo: Mapped["Modulo"] = relationship("Modulo", back_populates="certificados", lazy="raise")
     intento: Mapped["Intento"] = relationship(
         "Intento", back_populates="certificados", lazy="raise"
     )

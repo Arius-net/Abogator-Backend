@@ -45,7 +45,9 @@ async def tarea_recordatorio_racha(sesion: AsyncSession) -> int:
             if not prefs.get("notif_racha", True):
                 continue
 
-            inicio_dia_local = datetime.combine(hoy_local, time.min, tzinfo=tz).astimezone(timezone.utc)
+            inicio_dia_local = datetime.combine(hoy_local, time.min, tzinfo=tz).astimezone(
+                timezone.utc
+            )
             q_existente = select(Notificacion).where(
                 Notificacion.usuario_id == u.id,
                 Notificacion.tipo == "racha",

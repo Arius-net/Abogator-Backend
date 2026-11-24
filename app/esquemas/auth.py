@@ -14,7 +14,6 @@ except ImportError:
     EmailStr = Annotated[str, Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")]  # type: ignore[misc]
 
 
-
 def _validar_contrasena(v: str) -> str:
     """Mínimo 8 caracteres, al menos un número (06 §3)."""
     if len(v) < 8:
@@ -22,7 +21,6 @@ def _validar_contrasena(v: str) -> str:
     if not any(c.isdigit() for c in v):
         raise ValueError("La contraseña debe contener al menos un número.")
     return v
-
 
 
 class ConsentimientoInput(BaseModel):
@@ -59,7 +57,6 @@ class RegistroInput(BaseModel):
         return v
 
 
-
 class LoginInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     correo: EmailStr
@@ -67,11 +64,9 @@ class LoginInput(BaseModel):
     dispositivo: str | None = Field(default=None, max_length=80)
 
 
-
 class RenovarInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     refresh_token: str
-
 
 
 class LogoutInput(BaseModel):
@@ -79,11 +74,9 @@ class LogoutInput(BaseModel):
     refresh_token: str
 
 
-
 class RecuperarInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     correo: EmailStr
-
 
 
 class RestablecerInput(BaseModel):
@@ -95,7 +88,6 @@ class RestablecerInput(BaseModel):
     @classmethod
     def validar_nueva(cls, v: str) -> str:
         return _validar_contrasena(v)
-
 
 
 class TokensRespuesta(BaseModel):

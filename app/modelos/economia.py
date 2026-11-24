@@ -40,9 +40,7 @@ class Comodin(Base):
     nombre: Mapped[str] = mapped_column(String(40), nullable=False)
     descripcion: Mapped[str] = mapped_column(Text, nullable=False)
     precio: Mapped[int] = mapped_column(Integer, nullable=False)
-    permitido_en_examen: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False
-    )
+    permitido_en_examen: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     activo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
 
@@ -58,9 +56,7 @@ class MovimientoEconomia(Base):
     saldo_resultante: Mapped[int] = mapped_column(Integer, nullable=False)
     motivo: Mapped[str] = mapped_column(String(30), nullable=False)
     detalle: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
-    referencia_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
+    referencia_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     creado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

@@ -145,7 +145,9 @@ async def test_dos_intentos_sprint_simultaneos_solo_uno_crea():
             id=uuid.uuid4(),
             version=1,
             sprint_id=1,
-            tipo=TipoTarjeta.normal if i <= 6 else (TipoTarjeta.evidencia if i <= 9 else TipoTarjeta.justificacion),
+            tipo=TipoTarjeta.normal
+            if i <= 6
+            else (TipoTarjeta.evidencia if i <= 9 else TipoTarjeta.justificacion),
             categoria="datos",
             personaje_nombre="Dev",
             personaje_rol="Frontend",
@@ -159,8 +161,22 @@ async def test_dos_intentos_sprint_simultaneos_solo_uno_crea():
                     "condicional": {"resultado": "parcial"},
                     "escalar": {"resultado": "incorrecto"},
                 },
-                "evidencia": {"formato": "codigo", "nombre_archivo": "a.py", "contenido_texto": "x", "lineas_infractoras": [1]} if i in (7, 8, 9) else None,
-                "micro_pregunta": {"tipo": "por_que", "enunciado": "?", "opciones": [{"id": 1, "texto": "A", "es_correcta": True}, {"id": 2, "texto": "B", "es_correcta": False}]},
+                "evidencia": {
+                    "formato": "codigo",
+                    "nombre_archivo": "a.py",
+                    "contenido_texto": "x",
+                    "lineas_infractoras": [1],
+                }
+                if i in (7, 8, 9)
+                else None,
+                "micro_pregunta": {
+                    "tipo": "por_que",
+                    "enunciado": "?",
+                    "opciones": [
+                        {"id": 1, "texto": "A", "es_correcta": True},
+                        {"id": 2, "texto": "B", "es_correcta": False},
+                    ],
+                },
             },
             activa=True,
         )
@@ -219,7 +235,19 @@ async def test_dos_respuestas_simultaneas_misma_tarjeta_rechaza_segunda():
         contenido_interactivo={"veredictos": {"legal": {"resultado": "correcto"}}},
         activa=True,
     )
-    sprint = Sprint(id=1, modulo_id=1, orden=1, titulo="S1", objetivo="Obj", es_examen=False, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    sprint = Sprint(
+        id=1,
+        modulo_id=1,
+        orden=1,
+        titulo="S1",
+        objetivo="Obj",
+        es_examen=False,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
 
     sesion_mock = AsyncMock()
     servicio = JuegoServicio(sesion_mock)
@@ -312,7 +340,12 @@ async def test_sync_lote_repetido_devuelve_duplicada():
         res1 = await servicio.sincronizar(USUARIO_ID_TEST, lote)
         assert res1.resultados[0].estado == "aplicada"
 
-        resp_existente = Respuesta(id=resp_id, intento_id=intento_id, tarjeta_id=uuid.uuid4(), resultado=ResultadoRespuesta.correcto)
+        resp_existente = Respuesta(
+            id=resp_id,
+            intento_id=intento_id,
+            tarjeta_id=uuid.uuid4(),
+            resultado=ResultadoRespuesta.correcto,
+        )
 
         res2 = await servicio.sincronizar(USUARIO_ID_TEST, lote)
         assert res2.resultados[0].estado == "duplicada"

@@ -9,12 +9,14 @@ from app.core.errores import (
     handler_error_negocio,
 )
 
+
 def test_excepciones_negocio_atributos() -> None:
     exc = SinVidas(detalle={"proxima_vida_en": "2026-11-16T20:00:00Z"})
     assert exc.http_status == 403
     assert exc.codigo == "SIN_VIDAS"
     assert exc.detalle == {"proxima_vida_en": "2026-11-16T20:00:00Z"}
     assert "vidas" in exc.mensaje.lower()
+
 
 def test_formato_respuesta_error_negocio() -> None:
     app = FastAPI()
@@ -34,7 +36,7 @@ def test_formato_respuesta_error_negocio() -> None:
         raise DemasiasiasPeticiones(detalle={"retry_after": 60})
 
     client = TestClient(app)
-    
+
     resp = client.get("/test-error")
     assert resp.status_code == 403
     data = resp.json()

@@ -36,6 +36,7 @@ client = TestClient(app)
 
 # ── Fixtures y datos de prueba ────────────────────────────────────────────────
 
+
 @pytest.fixture
 def cfg():
     return get_config()
@@ -56,12 +57,11 @@ def _payload_registro(cfg) -> dict:
 
 # ── Tests de Endpoints HTTP (/v1/auth) ─────────────────────────────────────────
 
+
 class TestEndpointsAuth:
     def test_registro_exitoso(self, cfg) -> None:
         payload = _payload_registro(cfg)
-        with patch.object(
-            AuthServicio, "registrar", new_callable=AsyncMock
-        ) as mock_reg:
+        with patch.object(AuthServicio, "registrar", new_callable=AsyncMock) as mock_reg:
             mock_reg.return_value = ("fake_access_token", "fake_refresh_token")
             resp = client.post("/v1/auth/registro", json=payload)
 
@@ -73,9 +73,7 @@ class TestEndpointsAuth:
 
     def test_registro_correo_duplicado_retorna_409(self, cfg) -> None:
         payload = _payload_registro(cfg)
-        with patch.object(
-            AuthServicio, "registrar", new_callable=AsyncMock
-        ) as mock_reg:
+        with patch.object(AuthServicio, "registrar", new_callable=AsyncMock) as mock_reg:
             mock_reg.side_effect = EmailEnUso()
             resp = client.post("/v1/auth/registro", json=payload)
 
@@ -96,8 +94,10 @@ class TestEndpointsAuth:
         assert resp.status_code == 422
 
     def test_login_exitoso(self) -> None:
-        with patch("app.dominios.auth.router.verificar_rate_login", new_callable=AsyncMock), \
-             patch.object(AuthServicio, "login", new_callable=AsyncMock) as mock_login:
+        with (
+            patch("app.dominios.auth.router.verificar_rate_login", new_callable=AsyncMock),
+            patch.object(AuthServicio, "login", new_callable=AsyncMock) as mock_login,
+        ):
             mock_login.return_value = ("access_123", "refresh_123")
             resp = client.post(
                 "/v1/auth/login",
@@ -110,8 +110,10 @@ class TestEndpointsAuth:
         assert data["refresh_token"] == "refresh_123"
 
     def test_login_credenciales_invalidas_retorna_401(self) -> None:
-        with patch("app.dominios.auth.router.verificar_rate_login", new_callable=AsyncMock), \
-             patch.object(AuthServicio, "login", new_callable=AsyncMock) as mock_login:
+        with (
+            patch("app.dominios.auth.router.verificar_rate_login", new_callable=AsyncMock),
+            patch.object(AuthServicio, "login", new_callable=AsyncMock) as mock_login,
+        ):
             mock_login.side_effect = CredencialesInvalidas()
             resp = client.post(
                 "/v1/auth/login",
@@ -181,12 +183,8 @@ class TestEndpointsAuth:
         ) as mock_recup:
             mock_recup.return_value = None
 
-            resp1 = client.post(
-                "/v1/auth/recuperar", json={"correo": "existe@ejemplo.com"}
-            )
-            resp2 = client.post(
-                "/v1/auth/recuperar", json={"correo": "no_existe@ejemplo.com"}
-            )
+            resp1 = client.post("/v1/auth/recuperar", json={"correo": "existe@ejemplo.com"})
+            resp2 = client.post("/v1/auth/recuperar", json={"correo": "no_existe@ejemplo.com"})
 
         assert resp1.status_code == 200
         assert resp2.status_code == 200
@@ -222,6 +220,7 @@ class TestEndpointsAuth:
 
 # ── Tests de Seguridad en AuthServicio (Lógica de Negocio) ────────────────────
 
+
 class TestSeguridadAuthServicio:
     @pytest.mark.asyncio
     async def test_reuso_refresh_token_revoca_toda_la_cadena(self) -> None:
@@ -242,11 +241,14 @@ class TestSeguridadAuthServicio:
             expira_en=now() + timedelta(days=10),
         )
 
-        with patch.object(
-            servicio._repo, "buscar_sesion_por_hash", new_callable=AsyncMock
-        ) as m_buscar, patch.object(
-            servicio._repo, "revocar_cadena_de_sesion", new_callable=AsyncMock
-        ) as m_revocar_cadena:
+        with (
+            patch.object(
+                servicio._repo, "buscar_sesion_por_hash", new_callable=AsyncMock
+            ) as m_buscar,
+            patch.object(
+                servicio._repo, "revocar_cadena_de_sesion", new_callable=AsyncMock
+            ) as m_revocar_cadena,
+        ):
             m_buscar.return_value = sesion_revocada
 
             with pytest.raises(NoAutenticado):
@@ -283,15 +285,14 @@ class TestSeguridadAuthServicio:
             estado_cuenta=EstadoCuenta.activo,
         )
 
-        with patch.object(
-            servicio._repo, "buscar_sesion_por_hash", new_callable=AsyncMock
-        ) as m_buscar_sesion, patch.object(
-            servicio._repo, "buscar_por_id", new_callable=AsyncMock
-        ) as m_buscar_user, patch.object(
-            servicio._repo, "revocar_sesion", new_callable=AsyncMock
-        ) as m_revocar, patch.object(
-            servicio._repo, "crear_sesion", new_callable=AsyncMock
-        ) as m_crear_sesion:
+        with (
+            patch.object(
+                servicio._repo, "buscar_sesion_por_hash", new_callable=AsyncMock
+            ) as m_buscar_sesion,
+            patch.object(servicio._repo, "buscar_por_id", new_callable=AsyncMock) as m_buscar_user,
+            patch.object(servicio._repo, "revocar_sesion", new_callable=AsyncMock) as m_revocar,
+            patch.object(servicio._repo, "crear_sesion", new_callable=AsyncMock) as m_crear_sesion,
+        ):
             m_buscar_sesion.return_value = sesion_activa
             m_buscar_user.return_value = usuario
 
@@ -315,11 +316,10 @@ class TestSeguridadAuthServicio:
         mock_sesion_db = AsyncMock()
         servicio = AuthServicio(mock_sesion_db)
 
-        with patch.object(
-            servicio._repo, "buscar_por_correo", new_callable=AsyncMock
-        ) as m_buscar, patch(
-            "app.dominios.auth.servicio.get_correo_provider"
-        ) as m_get_correo:
+        with (
+            patch.object(servicio._repo, "buscar_por_correo", new_callable=AsyncMock) as m_buscar,
+            patch("app.dominios.auth.servicio.get_correo_provider") as m_get_correo,
+        ):
             m_buscar.return_value = None
             mock_correo_prov = AsyncMock()
             m_get_correo.return_value = mock_correo_prov
@@ -353,13 +353,15 @@ class TestSeguridadAuthServicio:
             usado_en=None,
         )
 
-        with patch.object(
-            servicio._repo, "buscar_restablecimiento_por_hash", new_callable=AsyncMock
-        ) as m_buscar_reset, patch.object(
-            servicio._repo, "buscar_por_id", new_callable=AsyncMock
-        ) as m_buscar_user, patch.object(
-            servicio._repo, "revocar_todas_sesiones_usuario", new_callable=AsyncMock
-        ) as m_revocar_todas:
+        with (
+            patch.object(
+                servicio._repo, "buscar_restablecimiento_por_hash", new_callable=AsyncMock
+            ) as m_buscar_reset,
+            patch.object(servicio._repo, "buscar_por_id", new_callable=AsyncMock) as m_buscar_user,
+            patch.object(
+                servicio._repo, "revocar_todas_sesiones_usuario", new_callable=AsyncMock
+            ) as m_revocar_todas,
+        ):
             m_buscar_reset.return_value = reset
             m_buscar_user.return_value = usuario
 

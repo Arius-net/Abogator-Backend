@@ -18,11 +18,15 @@ async def tarea_cierre_racha(sesion: AsyncSession) -> int:
             return 0
 
         ahora = now()
-        q = select(Usuario).where(
-            Usuario.estado_cuenta == EstadoCuenta.activo,
-            Usuario.racha_actual > 0,
-            Usuario.ultimo_dia_racha != None,
-        ).with_for_update()
+        q = (
+            select(Usuario)
+            .where(
+                Usuario.estado_cuenta == EstadoCuenta.activo,
+                Usuario.racha_actual > 0,
+                Usuario.ultimo_dia_racha != None,
+            )
+            .with_for_update()
+        )
         res = await sesion.execute(q)
         usuarios = list(res.scalars())
 

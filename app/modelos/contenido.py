@@ -39,9 +39,7 @@ class Modulo(Base):
     color_token: Mapped[str] = mapped_column(String(40), nullable=False)
     activo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    sprints: Mapped[list["Sprint"]] = relationship(
-        "Sprint", back_populates="modulo", lazy="raise"
-    )
+    sprints: Mapped[list["Sprint"]] = relationship("Sprint", back_populates="modulo", lazy="raise")
     certificados: Mapped[list["Certificado"]] = relationship(
         "Certificado", back_populates="modulo", lazy="raise"
     )
@@ -53,9 +51,7 @@ class Sprint(Base):
     __tablename__ = "sprints"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    modulo_id: Mapped[int] = mapped_column(
-        SmallInteger, ForeignKey("modulos.id"), nullable=False
-    )
+    modulo_id: Mapped[int] = mapped_column(SmallInteger, ForeignKey("modulos.id"), nullable=False)
     orden: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     es_examen: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     titulo: Mapped[str] = mapped_column(String(120), nullable=False)
@@ -69,9 +65,7 @@ class Sprint(Base):
 
     escenario_jefe: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
 
-    modulo: Mapped["Modulo"] = relationship(
-        "Modulo", back_populates="sprints", lazy="raise"
-    )
+    modulo: Mapped["Modulo"] = relationship("Modulo", back_populates="sprints", lazy="raise")
     tarjetas: Mapped[list["Tarjeta"]] = relationship(
         "Tarjeta", back_populates="sprint", lazy="raise"
     )
@@ -110,13 +104,9 @@ class Sprint(Base):
 class Tarjeta(Base):
     __tablename__ = "tarjetas"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    sprint_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("sprints.id"), nullable=False
-    )
+    sprint_id: Mapped[int] = mapped_column(Integer, ForeignKey("sprints.id"), nullable=False)
 
     tipo: Mapped[TipoTarjeta] = mapped_column(
         SAEnum(TipoTarjeta, name="tipo_tarjeta", create_type=False),
@@ -131,9 +121,7 @@ class Tarjeta(Base):
     explicacion: Mapped[str] = mapped_column(Text, nullable=False)
     nota_abogado: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    array_palabras_trampa: Mapped[list[str] | None] = mapped_column(
-        ARRAY(Text), nullable=True
-    )
+    array_palabras_trampa: Mapped[list[str] | None] = mapped_column(ARRAY(Text), nullable=True)
 
     contenido_interactivo: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
 
@@ -145,9 +133,7 @@ class Tarjeta(Base):
         onupdate=func.now(),
     )
 
-    sprint: Mapped["Sprint"] = relationship(
-        "Sprint", back_populates="tarjetas", lazy="raise"
-    )
+    sprint: Mapped["Sprint"] = relationship("Sprint", back_populates="tarjetas", lazy="raise")
     respuestas: Mapped[list["Respuesta"]] = relationship(
         "Respuesta", back_populates="tarjeta", lazy="raise"
     )
@@ -155,6 +141,4 @@ class Tarjeta(Base):
         "Apelacion", back_populates="tarjeta", lazy="raise"
     )
 
-    __table_args__ = (
-        Index("ix_tarjetas_sprint_activa_tipo", "sprint_id", "activa", "tipo"),
-    )
+    __table_args__ = (Index("ix_tarjetas_sprint_activa_tipo", "sprint_id", "activa", "tipo"),)

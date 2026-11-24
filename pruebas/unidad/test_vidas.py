@@ -35,6 +35,7 @@ def _calcular_estado_vidas(
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
+
 class TestRegenLazy:
     def test_tres_vidas_cuatro_horas_llega_a_tope(self) -> None:
         """3 vidas + 4h transcurridas → llega al tope (5), no hay proxima_vida_en."""

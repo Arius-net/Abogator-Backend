@@ -29,9 +29,7 @@ class JuegoRepositorio:
     async def buscar_sprint(self, sprint_id: int) -> Sprint | None:
         return await self._s.get(Sprint, sprint_id)
 
-    async def buscar_progreso(
-        self, usuario_id: uuid.UUID, sprint_id: int
-    ) -> ProgresoSprint | None:
+    async def buscar_progreso(self, usuario_id: uuid.UUID, sprint_id: int) -> ProgresoSprint | None:
         res = await self._s.execute(
             select(ProgresoSprint).where(
                 ProgresoSprint.usuario_id == usuario_id,
@@ -79,9 +77,7 @@ class JuegoRepositorio:
     async def buscar_intento_por_id(self, intento_id: uuid.UUID) -> Intento | None:
         return await self._s.get(Intento, intento_id)
 
-    async def buscar_intento_por_id_con_lock(
-        self, intento_id: uuid.UUID
-    ) -> Intento | None:
+    async def buscar_intento_por_id_con_lock(self, intento_id: uuid.UUID) -> Intento | None:
         res = await self._s.execute(
             select(Intento).where(Intento.id == intento_id).with_for_update()
         )
@@ -121,9 +117,7 @@ class JuegoRepositorio:
                         vistas.add(uuid.UUID(str(tid)))
         return vistas
 
-    async def buscar_tarjeta_version(
-        self, tarjeta_id: uuid.UUID, version: int
-    ) -> Tarjeta | None:
+    async def buscar_tarjeta_version(self, tarjeta_id: uuid.UUID, version: int) -> Tarjeta | None:
         res = await self._s.execute(
             select(Tarjeta).where(
                 Tarjeta.id == tarjeta_id,
@@ -172,18 +166,12 @@ class JuegoRepositorio:
 
     async def contar_respuestas_intento(self, intento_id: uuid.UUID) -> int:
         res = await self._s.execute(
-            select(func.count())
-            .select_from(Respuesta)
-            .where(Respuesta.intento_id == intento_id)
+            select(func.count()).select_from(Respuesta).where(Respuesta.intento_id == intento_id)
         )
         return res.scalar_one()
 
-    async def listar_respuestas_intento(
-        self, intento_id: uuid.UUID
-    ) -> list[Respuesta]:
-        res = await self._s.execute(
-            select(Respuesta).where(Respuesta.intento_id == intento_id)
-        )
+    async def listar_respuestas_intento(self, intento_id: uuid.UUID) -> list[Respuesta]:
+        res = await self._s.execute(select(Respuesta).where(Respuesta.intento_id == intento_id))
         return list(res.scalars())
 
     async def otorgar_insignia(self, usuario_id: uuid.UUID, clave: str) -> bool:
@@ -205,9 +193,7 @@ class JuegoRepositorio:
     async def buscar_modulo(self, modulo_id: int) -> Modulo | None:
         return await self._s.get(Modulo, modulo_id)
 
-    async def contar_sprints_completados_modulo(
-        self, usuario_id: uuid.UUID, modulo_id: int
-    ) -> int:
+    async def contar_sprints_completados_modulo(self, usuario_id: uuid.UUID, modulo_id: int) -> int:
         res = await self._s.execute(
             select(func.count())
             .select_from(ProgresoSprint)
@@ -221,9 +207,7 @@ class JuegoRepositorio:
         )
         return res.scalar_one()
 
-    async def buscar_certificado(
-        self, usuario_id: uuid.UUID, modulo_id: int
-    ) -> Certificado | None:
+    async def buscar_certificado(self, usuario_id: uuid.UUID, modulo_id: int) -> Certificado | None:
         res = await self._s.execute(
             select(Certificado).where(
                 Certificado.usuario_id == usuario_id,
@@ -242,9 +226,7 @@ class JuegoRepositorio:
     async def desbloquear_siguiente_modulo(
         self, usuario_id: uuid.UUID, modulo_numero_siguiente: int
     ) -> None:
-        res = await self._s.execute(
-            select(Modulo).where(Modulo.numero == modulo_numero_siguiente)
-        )
+        res = await self._s.execute(select(Modulo).where(Modulo.numero == modulo_numero_siguiente))
         mod_sig = res.scalar_one_or_none()
         if mod_sig is None:
             return

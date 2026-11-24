@@ -9,7 +9,14 @@ import pytest
 
 from app.core.reloj import now
 from app.modelos.apelaciones import Apelacion, Notificacion
-from app.modelos.enums import EstadoApelacion, EstadoCuenta, EstadoIntento, PerfilUsuario, RolUsuario, TipoIntento
+from app.modelos.enums import (
+    EstadoApelacion,
+    EstadoCuenta,
+    EstadoIntento,
+    PerfilUsuario,
+    RolUsuario,
+    TipoIntento,
+)
 from app.modelos.juego import Intento
 from app.modelos.usuarios import DispositivoPush, SesionRefresh, Usuario
 from worker.tareas.anonimizacion import tarea_anonimizacion
@@ -137,8 +144,12 @@ async def test_tarea_envio_push_y_desactiva_token_invalido():
         programada_para=now() - timedelta(minutes=5),
         estado="pendiente",
     )
-    dev_valido = DispositivoPush(id=uuid.uuid4(), usuario_id=uid, plataforma="android", token="token_bueno", activo=True)
-    dev_invalido = DispositivoPush(id=uuid.uuid4(), usuario_id=uid, plataforma="ios", token="invalid_token", activo=True)
+    dev_valido = DispositivoPush(
+        id=uuid.uuid4(), usuario_id=uid, plataforma="android", token="token_bueno", activo=True
+    )
+    dev_invalido = DispositivoPush(
+        id=uuid.uuid4(), usuario_id=uid, plataforma="ios", token="invalid_token", activo=True
+    )
 
     sesion = AsyncMock()
     res_notifs = MagicMock()
@@ -196,8 +207,12 @@ async def test_tarea_cierre_racha_consume_congelar_o_reinicia():
     tz = ZoneInfo("America/Mexico_City")
     hoy_local = now().astimezone(tz).date()
     hace_dos_dias = hoy_local - timedelta(days=2)
-    u_congelar = _crear_usuario_test(racha_actual=5, ultimo_dia_racha=hace_dos_dias, congelar_racha=1)
-    u_sin_congelar = _crear_usuario_test(racha_actual=3, ultimo_dia_racha=hace_dos_dias, congelar_racha=0)
+    u_congelar = _crear_usuario_test(
+        racha_actual=5, ultimo_dia_racha=hace_dos_dias, congelar_racha=1
+    )
+    u_sin_congelar = _crear_usuario_test(
+        racha_actual=3, ultimo_dia_racha=hace_dos_dias, congelar_racha=0
+    )
 
     sesion = AsyncMock()
     res = MagicMock()
@@ -217,7 +232,9 @@ async def test_tarea_recordatorio_racha_a_las_19_horas():
     ahora_19 = datetime.now(tz).replace(hour=19, minute=5, second=0)
 
     with patch("worker.tareas.recordatorio_racha.now", return_value=ahora_19):
-        u = _crear_usuario_test(racha_actual=4, ultimo_dia_racha=ahora_19.date() - timedelta(days=1))
+        u = _crear_usuario_test(
+            racha_actual=4, ultimo_dia_racha=ahora_19.date() - timedelta(days=1)
+        )
 
         sesion = AsyncMock()
         res_users = MagicMock()

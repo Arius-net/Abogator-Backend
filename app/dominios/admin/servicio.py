@@ -125,7 +125,9 @@ class AdminServicio:
             raise NoEncontrado()
 
         if not vieja.activa:
-            raise PeticionInvalida(detalle={"motivo": "Solo se puede editar la versión activa de una tarjeta."})
+            raise PeticionInvalida(
+                detalle={"motivo": "Solo se puede editar la versión activa de una tarjeta."}
+            )
 
         vieja.activa = False
 
@@ -217,7 +219,9 @@ class AdminServicio:
                 ci = ContenidoInteractivo.model_validate(tarjeta.contenido_interactivo)
                 ci.validar_para_tipo_tarjeta(tarjeta.tipo.value)
             except Exception as e:
-                raise PeticionInvalida(detalle={"motivo": f"Contenido interactivo no válido para activación: {e}"})
+                raise PeticionInvalida(
+                    detalle={"motivo": f"Contenido interactivo no válido para activación: {e}"}
+                )
 
         estado_anterior = tarjeta.activa
         tarjeta.activa = datos.activa
@@ -259,7 +263,9 @@ class AdminServicio:
         if sprint is None:
             raise NoEncontrado()
         if not sprint.es_examen:
-            raise PeticionInvalida(detalle={"motivo": "Solo los sprints de examen pueden tener escenario."})
+            raise PeticionInvalida(
+                detalle={"motivo": "Solo los sprints de examen pueden tener escenario."}
+            )
 
         for d in datos.escenario.decisiones:
             t = await self._repo.buscar_tarjeta_por_id(d.tarjeta_id)
@@ -291,7 +297,9 @@ class AdminServicio:
         if sprint is None:
             raise NoEncontrado()
         if not sprint.es_examen:
-            raise PeticionInvalida(detalle={"motivo": "Solo los sprints de examen pueden tener escenario."})
+            raise PeticionInvalida(
+                detalle={"motivo": "Solo los sprints de examen pueden tener escenario."}
+            )
 
         for d in datos.escenario.decisiones:
             t = await self._repo.buscar_tarjeta_por_id(d.tarjeta_id)

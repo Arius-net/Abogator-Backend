@@ -36,9 +36,7 @@ if TYPE_CHECKING:
 class Usuario(Base):
     __tablename__ = "usuarios"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre: Mapped[str] = mapped_column(String(80), nullable=False)
     correo: Mapped[str] = mapped_column(CITEXT, nullable=False, unique=True)
     hash_contrasena: Mapped[str] = mapped_column(String(72), nullable=False)
@@ -81,12 +79,8 @@ class Usuario(Base):
     creado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    ultimo_acceso: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    eliminado_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    ultimo_acceso: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    eliminado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     consentimientos: Mapped[list["Consentimiento"]] = relationship(
         "Consentimiento", back_populates="usuario", lazy="raise"
@@ -156,9 +150,7 @@ class Consentimiento(Base):
 class SesionRefresh(Base):
     __tablename__ = "sesiones_refresh"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )
@@ -167,39 +159,27 @@ class SesionRefresh(Base):
     creado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    expira_en: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    revocado_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    reemplazado_por: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
+    expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revocado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reemplazado_por: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
 
     usuario: Mapped["Usuario"] = relationship(
         "Usuario", back_populates="sesiones_refresh", lazy="raise"
     )
 
-    __table_args__ = (
-        Index("ix_sesiones_refresh_usuario_id", "usuario_id"),
-    )
+    __table_args__ = (Index("ix_sesiones_refresh_usuario_id", "usuario_id"),)
 
 
 class RestablecimientoContrasena(Base):
     __tablename__ = "restablecimientos_contrasena"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    usado_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    usado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     usuario: Mapped["Usuario"] = relationship(
         "Usuario", back_populates="restablecimientos", lazy="raise"
@@ -209,9 +189,7 @@ class RestablecimientoContrasena(Base):
 class DispositivoPush(Base):
     __tablename__ = "dispositivos_push"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )

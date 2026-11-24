@@ -69,16 +69,13 @@ class AdminRepositorio:
         return auditoria
 
     async def obtener_metricas(self) -> dict[str, Any]:
-        q_tarjetas = (
-            select(
-                Respuesta.tarjeta_id,
-                func.count().label("total"),
-                func.sum(
-                    case((Respuesta.resultado == ResultadoRespuesta.correcto, 1), else_=0)
-                ).label("aciertos"),
-            )
-            .group_by(Respuesta.tarjeta_id)
-        )
+        q_tarjetas = select(
+            Respuesta.tarjeta_id,
+            func.count().label("total"),
+            func.sum(case((Respuesta.resultado == ResultadoRespuesta.correcto, 1), else_=0)).label(
+                "aciertos"
+            ),
+        ).group_by(Respuesta.tarjeta_id)
         res_t = await self._s.execute(q_tarjetas)
         tasa_tarjetas = []
         for fila in res_t.all():
@@ -99,8 +96,7 @@ class AdminRepositorio:
         )
         res_q = await self._s.execute(q_quiebras)
         quiebras_sprint = [
-            {"sprint_id": fila.sprint_id, "quiebras": fila.quiebras}
-            for fila in res_q.all()
+            {"sprint_id": fila.sprint_id, "quiebras": fila.quiebras} for fila in res_q.all()
         ]
 
         return {

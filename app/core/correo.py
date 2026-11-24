@@ -20,7 +20,6 @@ class CorreoProvider(ABC):
         ...
 
 
-
 class CorreoSimulado(CorreoProvider):
     """Registra en log en lugar de enviar. Útil en pruebas y local."""
 
@@ -36,7 +35,6 @@ class CorreoSimulado(CorreoProvider):
             prefijo,
             enlace,
         )
-
 
 
 class CorreoMailpit(CorreoProvider):
@@ -74,7 +72,6 @@ class CorreoMailpit(CorreoProvider):
         )
 
 
-
 class CorreoSES(CorreoProvider):
     async def enviar_recuperacion(
         self,
@@ -83,7 +80,6 @@ class CorreoSES(CorreoProvider):
         enlace: str,
     ) -> None:
         raise NotImplementedError("Proveedor SES aún no configurado. Ver 11_pendientes.md.")
-
 
 
 def get_correo_provider() -> CorreoProvider:

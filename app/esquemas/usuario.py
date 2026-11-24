@@ -9,7 +9,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.esquemas.jsonb import Inventario, Preferencias, RetoDiario
 
 
-
 class UsuarioRespuesta(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -29,7 +28,6 @@ class UsuarioRespuesta(BaseModel):
     ultimo_acceso: datetime | None
 
 
-
 class ActualizarCuentaInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -47,19 +45,15 @@ class ActualizarCuentaInput(BaseModel):
         return v
 
 
-
 class EstadoRespuesta(BaseModel):
     vidas: int
     vidas_max: int
-    proxima_vida_en: datetime | None   # null si vidas == vidas_max
+    proxima_vida_en: datetime | None  # null si vidas == vidas_max
     monedas: int
     xp: int
     nivel: int
     racha_actual: int
     amparo_activo: bool
-
-
-
 
 
 class DispositivoInput(BaseModel):
@@ -74,7 +68,6 @@ class DispositivoRespuesta(BaseModel):
     activo: bool
 
 
-
 class DatosPersonalesRespuesta(BaseModel):
     id: uuid.UUID
     nombre: str
@@ -86,10 +79,8 @@ class DatosPersonalesRespuesta(BaseModel):
     dispositivos_push: list[dict[str, Any]]
 
 
-
 class InventarioRespuesta(BaseModel):
     inventario: Inventario
-
 
 
 class MovimientoRespuesta(BaseModel):
@@ -109,7 +100,6 @@ class MovimientosPaginados(BaseModel):
     por_pagina: int
 
 
-
 class ProgresoModuloRespuesta(BaseModel):
     modulo_id: int
     numero: int
@@ -120,12 +110,11 @@ class ProgresoModuloRespuesta(BaseModel):
 
 
 class PerfilRespuesta(BaseModel):
-    precision_global: float       # % de respuestas correctas
+    precision_global: float  # % de respuestas correctas
     racha_actual: int
     racha_maxima: int
-    sprints_perfectos: int        # con 3 estrellas
+    sprints_perfectos: int  # con 3 estrellas
     progreso_modulos: list[ProgresoModuloRespuesta]
-
 
 
 class InsigniaRespuesta(BaseModel):
@@ -137,14 +126,12 @@ class InsigniaRespuesta(BaseModel):
     obtenida_en: datetime | None
 
 
-
 class CertificadoRespuesta(BaseModel):
     folio: str
     modulo_numero: int
     modulo_titulo: str
     emitido_en: datetime
     nombre_usuario: str
-
 
 
 class RetoRespuesta(BaseModel):

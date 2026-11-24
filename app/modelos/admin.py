@@ -30,6 +30,4 @@ class AuditoriaAdmin(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
-    admin: Mapped["Usuario"] = relationship(
-        "Usuario", back_populates="auditorias", lazy="raise"
-    )
+    admin: Mapped["Usuario"] = relationship("Usuario", back_populates="auditorias", lazy="raise")

@@ -23,12 +23,9 @@ class UsuariosRepositorio:
     async def buscar_con_lock(self, usuario_id: uuid.UUID) -> Usuario | None:
         """SELECT … FOR UPDATE: usar cuando se toca economía (Regla de Oro 3)."""
         resultado = await self._s.execute(
-            select(Usuario)
-            .where(Usuario.id == usuario_id)
-            .with_for_update()
+            select(Usuario).where(Usuario.id == usuario_id).with_for_update()
         )
         return resultado.scalar_one_or_none()
-
 
     async def desbloquear_sprint_inicial(self, usuario_id: uuid.UUID) -> None:
         """Deja disponible el sprint 1 del módulo 1 al registrarse (05 §1)."""
@@ -49,6 +46,7 @@ class UsuariosRepositorio:
             estado=EstadoProgreso.disponible,
         )
         from sqlalchemy.dialects.postgresql import insert as pg_insert
+
         stmt = (
             pg_insert(ProgresoSprint)
             .values(
@@ -62,7 +60,6 @@ class UsuariosRepositorio:
             .on_conflict_do_nothing()
         )
         await self._s.execute(stmt)
-
 
     async def buscar_dispositivo_por_token(self, token: str) -> DispositivoPush | None:
         resultado = await self._s.execute(
@@ -94,7 +91,6 @@ class UsuariosRepositorio:
         self._s.add(dispositivo)
         return dispositivo
 
-
     async def listar_movimientos(
         self,
         usuario_id: uuid.UUID,
@@ -118,19 +114,15 @@ class UsuariosRepositorio:
 
         return list(items_res.scalars()), total_res.scalar_one()
 
-
     async def listar_insignias_todas(self) -> list[Insignia]:
         res = await self._s.execute(select(Insignia))
         return list(res.scalars())
 
-    async def listar_insignias_usuario(
-        self, usuario_id: uuid.UUID
-    ) -> list[UsuarioInsignia]:
+    async def listar_insignias_usuario(self, usuario_id: uuid.UUID) -> list[UsuarioInsignia]:
         res = await self._s.execute(
             select(UsuarioInsignia).where(UsuarioInsignia.usuario_id == usuario_id)
         )
         return list(res.scalars())
-
 
     async def listar_certificados(self, usuario_id: uuid.UUID) -> list[Certificado]:
         from sqlalchemy.orm import joinedload
@@ -146,18 +138,13 @@ class UsuariosRepositorio:
         )
         return list(res.scalars())
 
-
-    async def listar_consentimientos(
-        self, usuario_id: uuid.UUID
-    ) -> list[Consentimiento]:
+    async def listar_consentimientos(self, usuario_id: uuid.UUID) -> list[Consentimiento]:
         res = await self._s.execute(
             select(Consentimiento).where(Consentimiento.usuario_id == usuario_id)
         )
         return list(res.scalars())
 
-    async def listar_dispositivos(
-        self, usuario_id: uuid.UUID
-    ) -> list[DispositivoPush]:
+    async def listar_dispositivos(self, usuario_id: uuid.UUID) -> list[DispositivoPush]:
         res = await self._s.execute(
             select(DispositivoPush).where(DispositivoPush.usuario_id == usuario_id)
         )

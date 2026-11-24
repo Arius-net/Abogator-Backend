@@ -86,7 +86,12 @@ def test_sync_lote_con_duplicada_y_rechazada():
 
     async def mock_buscar_resp(rid):
         if rid == resp_duplicada_id:
-            return Respuesta(id=resp_duplicada_id, intento_id=intento_id_abierto, tarjeta_id=uuid.uuid4(), resultado=ResultadoRespuesta.correcto)
+            return Respuesta(
+                id=resp_duplicada_id,
+                intento_id=intento_id_abierto,
+                tarjeta_id=uuid.uuid4(),
+                resultado=ResultadoRespuesta.correcto,
+            )
         return None
 
     async def mock_buscar_intento(iid):

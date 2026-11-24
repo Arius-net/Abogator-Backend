@@ -19,10 +19,34 @@ from app.esquemas.contenido import (
 
 def _crear_veredictos_validos() -> dict:
     return {
-        "legal": {"resultado": "incorrecto", "d_presupuesto": 0, "d_reputacion": -5, "d_velocidad": 10, "d_riesgo": 25},
-        "ilegal": {"resultado": "correcto", "d_presupuesto": -5, "d_reputacion": 5, "d_velocidad": -10, "d_riesgo": -20},
-        "condicional": {"resultado": "parcial", "d_presupuesto": 0, "d_reputacion": 0, "d_velocidad": 0, "d_riesgo": 5},
-        "escalar": {"resultado": "incorrecto", "d_presupuesto": -10, "d_reputacion": 0, "d_velocidad": -5, "d_riesgo": 0},
+        "legal": {
+            "resultado": "incorrecto",
+            "d_presupuesto": 0,
+            "d_reputacion": -5,
+            "d_velocidad": 10,
+            "d_riesgo": 25,
+        },
+        "ilegal": {
+            "resultado": "correcto",
+            "d_presupuesto": -5,
+            "d_reputacion": 5,
+            "d_velocidad": -10,
+            "d_riesgo": -20,
+        },
+        "condicional": {
+            "resultado": "parcial",
+            "d_presupuesto": 0,
+            "d_reputacion": 0,
+            "d_velocidad": 0,
+            "d_riesgo": 5,
+        },
+        "escalar": {
+            "resultado": "incorrecto",
+            "d_presupuesto": -10,
+            "d_reputacion": 0,
+            "d_velocidad": -5,
+            "d_riesgo": 0,
+        },
     }
 
 
@@ -52,42 +76,50 @@ class TestContenidoInteractivoValidaciones:
         v = _crear_veredictos_validos()
         v["legal"]["resultado"] = "correcto"
         with pytest.raises(ValidationError):
-            ContenidoInteractivo.model_validate({
-                "veredictos": v,
-                "evidencia": None,
-                "micro_pregunta": _crear_micro_pregunta_valida(),
-            })
+            ContenidoInteractivo.model_validate(
+                {
+                    "veredictos": v,
+                    "evidencia": None,
+                    "micro_pregunta": _crear_micro_pregunta_valida(),
+                }
+            )
 
     def test_rechaza_cero_veredictos_correctos(self) -> None:
         v = _crear_veredictos_validos()
         v["ilegal"]["resultado"] = "incorrecto"
         with pytest.raises(ValidationError):
-            ContenidoInteractivo.model_validate({
-                "veredictos": v,
-                "evidencia": None,
-                "micro_pregunta": _crear_micro_pregunta_valida(),
-            })
+            ContenidoInteractivo.model_validate(
+                {
+                    "veredictos": v,
+                    "evidencia": None,
+                    "micro_pregunta": _crear_micro_pregunta_valida(),
+                }
+            )
 
     def test_rechaza_mas_de_dos_parciales(self) -> None:
         v = _crear_veredictos_validos()
         v["legal"]["resultado"] = "parcial"
         v["escalar"]["resultado"] = "parcial"
         with pytest.raises(ValidationError):
-            ContenidoInteractivo.model_validate({
-                "veredictos": v,
-                "evidencia": None,
-                "micro_pregunta": _crear_micro_pregunta_valida(),
-            })
+            ContenidoInteractivo.model_validate(
+                {
+                    "veredictos": v,
+                    "evidencia": None,
+                    "micro_pregunta": _crear_micro_pregunta_valida(),
+                }
+            )
 
     def test_rechaza_deltas_fuera_de_rango(self) -> None:
         v = _crear_veredictos_validos()
         v["legal"]["d_presupuesto"] = 150
         with pytest.raises(ValidationError):
-            ContenidoInteractivo.model_validate({
-                "veredictos": v,
-                "evidencia": None,
-                "micro_pregunta": _crear_micro_pregunta_valida(),
-            })
+            ContenidoInteractivo.model_validate(
+                {
+                    "veredictos": v,
+                    "evidencia": None,
+                    "micro_pregunta": _crear_micro_pregunta_valida(),
+                }
+            )
 
     def test_tarjeta_normal_rechaza_evidencia(self) -> None:
         raw = {
@@ -159,16 +191,18 @@ class TestEscenarioJefeValidaciones:
         decisiones = []
         for i in range(1, 11):
             hora = 0 if i <= 3 else (6 if i <= 6 else (24 if i <= 8 else 72))
-            decisiones.append({
-                "orden": i,
-                "tarjeta_id": str(uuid.uuid4()),
-                "hora_crisis": hora,
-                "replica_jefe": f"Replica {i}",
-                "fundamentos": [
-                    {"id": 1, "texto": "Fundamento A", "es_correcta": True},
-                    {"id": 2, "texto": "Fundamento B", "es_correcta": False},
-                ],
-            })
+            decisiones.append(
+                {
+                    "orden": i,
+                    "tarjeta_id": str(uuid.uuid4()),
+                    "hora_crisis": hora,
+                    "replica_jefe": f"Replica {i}",
+                    "fundamentos": [
+                        {"id": 1, "texto": "Fundamento A", "es_correcta": True},
+                        {"id": 2, "texto": "Fundamento B", "es_correcta": False},
+                    ],
+                }
+            )
         return {
             "nombre_jefe": "Inspectora Vega",
             "titulo_crisis": "Brecha de Datos",

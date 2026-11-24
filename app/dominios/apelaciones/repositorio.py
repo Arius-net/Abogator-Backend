@@ -15,9 +15,7 @@ class ApelacionesRepositorio:
     def __init__(self, sesion: AsyncSession) -> None:
         self._s = sesion
 
-    async def listar_apelaciones_pendientes(
-        self, usuario_id: uuid.UUID
-    ) -> list[Apelacion]:
+    async def listar_apelaciones_pendientes(self, usuario_id: uuid.UUID) -> list[Apelacion]:
         res = await self._s.execute(
             select(Apelacion)
             .where(
@@ -28,34 +26,22 @@ class ApelacionesRepositorio:
         )
         return list(res.scalars())
 
-    async def buscar_apelacion_por_id(
-        self, apelacion_id: uuid.UUID
-    ) -> Apelacion | None:
+    async def buscar_apelacion_por_id(self, apelacion_id: uuid.UUID) -> Apelacion | None:
         return await self._s.get(Apelacion, apelacion_id)
 
-    async def buscar_apelacion_con_lock(
-        self, apelacion_id: uuid.UUID
-    ) -> Apelacion | None:
+    async def buscar_apelacion_con_lock(self, apelacion_id: uuid.UUID) -> Apelacion | None:
         res = await self._s.execute(
-            select(Apelacion)
-            .where(Apelacion.id == apelacion_id)
-            .with_for_update()
+            select(Apelacion).where(Apelacion.id == apelacion_id).with_for_update()
         )
         return res.scalar_one_or_none()
 
-    async def buscar_usuario_con_lock(
-        self, usuario_id: uuid.UUID
-    ) -> Usuario | None:
+    async def buscar_usuario_con_lock(self, usuario_id: uuid.UUID) -> Usuario | None:
         res = await self._s.execute(
-            select(Usuario)
-            .where(Usuario.id == usuario_id)
-            .with_for_update()
+            select(Usuario).where(Usuario.id == usuario_id).with_for_update()
         )
         return res.scalar_one_or_none()
 
-    async def buscar_tarjeta_version(
-        self, tarjeta_id: uuid.UUID, version: int
-    ) -> Tarjeta | None:
+    async def buscar_tarjeta_version(self, tarjeta_id: uuid.UUID, version: int) -> Tarjeta | None:
         res = await self._s.execute(
             select(Tarjeta).where(
                 Tarjeta.id == tarjeta_id,
@@ -64,9 +50,7 @@ class ApelacionesRepositorio:
         )
         return res.scalar_one_or_none()
 
-    async def buscar_juicio_por_id(
-        self, juicio_id: uuid.UUID
-    ) -> JuicioApelacion | None:
+    async def buscar_juicio_por_id(self, juicio_id: uuid.UUID) -> JuicioApelacion | None:
         return await self._s.get(JuicioApelacion, juicio_id)
 
     async def crear_juicio(self, juicio: JuicioApelacion) -> None:

@@ -42,7 +42,9 @@ class TiendaServicio:
 
         total = comodin.precio * datos.cantidad
         if usuario.monedas < total:
-            raise SaldoInsuficiente(detalle={"monedas_actuales": usuario.monedas, "total_requerido": total})
+            raise SaldoInsuficiente(
+                detalle={"monedas_actuales": usuario.monedas, "total_requerido": total}
+            )
 
         usuario.monedas -= total
 

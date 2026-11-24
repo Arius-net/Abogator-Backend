@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import secrets
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,7 +42,6 @@ class AuthServicio:
         self._repo = AuthRepositorio(sesion)
         self._repo_usr = UsuariosRepositorio(sesion)
 
-
     async def registrar(
         self,
         datos: RegistroInput,
@@ -63,11 +62,13 @@ class AuthServicio:
         ]:
             if doc not in consentimientos_input:
                 from app.core.errores import PeticionInvalida
+
                 raise PeticionInvalida(
                     detalle={"campo": "consentimientos", "motivo": f"Falta el documento '{doc}'"}
                 )
             if consentimientos_input[doc].version != version_esperada:
                 from app.core.errores import PeticionInvalida
+
                 raise PeticionInvalida(
                     detalle={
                         "campo": "consentimientos",
@@ -133,7 +134,6 @@ class AuthServicio:
         await self._s.commit()
         return access, refresh
 
-
     async def login(
         self,
         correo: str,
@@ -156,7 +156,6 @@ class AuthServicio:
         )
         await self._s.commit()
         return access, refresh
-
 
     async def renovar(self, refresh_token_raw: str) -> tuple[str, str]:
         cfg = get_config()
@@ -183,9 +182,7 @@ class AuthServicio:
             raise NoAutenticado()
 
         nueva_sesion_id = uuid.uuid4()
-        await self._repo.revocar_sesion(
-            sesion.id, ahora, reemplazado_por=nueva_sesion_id
-        )
+        await self._repo.revocar_sesion(sesion.id, ahora, reemplazado_por=nueva_sesion_id)
 
         nuevo_refresh_raw = generar_refresh_token()
         nuevo_hash = hashear_token(nuevo_refresh_raw)
@@ -207,7 +204,6 @@ class AuthServicio:
         await self._s.commit()
         return nuevo_access, nuevo_refresh_raw
 
-
     async def logout(self, refresh_token_raw: str) -> None:
         token_hash = hashear_token(refresh_token_raw)
         sesion = await self._repo.buscar_sesion_por_hash(token_hash)
@@ -216,7 +212,6 @@ class AuthServicio:
 
         await self._repo.revocar_sesion(sesion.id, now())
         await self._s.commit()
-
 
     async def recuperar_contrasena(self, correo: str) -> None:
         """
@@ -253,10 +248,7 @@ class AuthServicio:
             enlace=enlace,
         )
 
-
-    async def restablecer_contrasena(
-        self, token_raw: str, nueva_contrasena: str
-    ) -> None:
+    async def restablecer_contrasena(self, token_raw: str, nueva_contrasena: str) -> None:
         token_hash = hashear_token(token_raw)
         reset = await self._repo.buscar_restablecimiento_por_hash(token_hash)
 
@@ -278,7 +270,6 @@ class AuthServicio:
 
         await self._repo.revocar_todas_sesiones_usuario(usuario.id, ahora)
         await self._s.commit()
-
 
     async def _crear_sesion(
         self,

@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
-
 class ErrorNegocio(Exception):
     """Excepción base para todos los errores de dominio de AboGator."""
 
@@ -24,7 +23,6 @@ class ErrorNegocio(Exception):
         if mensaje:
             self.mensaje = mensaje
         super().__init__(self.mensaje)
-
 
 
 class NoAutenticado(ErrorNegocio):
@@ -127,7 +125,6 @@ class DemasiasiasPeticiones(ErrorNegocio):
     http_status = 429
     codigo = "DEMASIADAS_PETICIONES"
     mensaje = "Demasiadas peticiones. Intenta más tarde."
-
 
 
 def _cuerpo_error(exc: ErrorNegocio, request_id: str) -> dict[str, Any]:

@@ -33,7 +33,6 @@ def _uid(payload: dict) -> uuid.UUID:
     return uuid.UUID(payload["sub"])
 
 
-
 @router.get(
     "/me",
     response_model=UsuarioRespuesta,
@@ -44,7 +43,6 @@ async def obtener_me(
     sesion: AsyncSession = Depends(get_sesion),
 ) -> UsuarioRespuesta:
     return await UsuariosServicio(sesion).obtener_usuario(_uid(payload))
-
 
 
 @router.patch(
@@ -60,7 +58,6 @@ async def actualizar_me(
     return await UsuariosServicio(sesion).actualizar_cuenta(_uid(payload), datos)
 
 
-
 @router.get(
     "/me/estado",
     response_model=EstadoRespuesta,
@@ -71,7 +68,6 @@ async def estado_me(
     sesion: AsyncSession = Depends(get_sesion),
 ) -> EstadoRespuesta:
     return await UsuariosServicio(sesion).estado_usuario(_uid(payload))
-
 
 
 @router.put(
@@ -85,7 +81,6 @@ async def guardar_preferencias(
     sesion: AsyncSession = Depends(get_sesion),
 ) -> Preferencias:
     return await UsuariosServicio(sesion).guardar_preferencias(_uid(payload), prefs)
-
 
 
 @router.post(
@@ -104,7 +99,6 @@ async def registrar_dispositivo(
     )
 
 
-
 @router.get(
     "/me/datos",
     response_model=DatosPersonalesRespuesta,
@@ -115,7 +109,6 @@ async def exportar_datos(
     sesion: AsyncSession = Depends(get_sesion),
 ) -> DatosPersonalesRespuesta:
     return await UsuariosServicio(sesion).exportar_datos(_uid(payload))
-
 
 
 @router.delete(
@@ -131,7 +124,6 @@ async def borrar_me(
     return Response(status_code=204)
 
 
-
 @router.get(
     "/me/inventario",
     response_model=InventarioRespuesta,
@@ -142,7 +134,6 @@ async def inventario_me(
     sesion: AsyncSession = Depends(get_sesion),
 ) -> InventarioRespuesta:
     return await UsuariosServicio(sesion).inventario_usuario(_uid(payload))
-
 
 
 @router.get(
@@ -156,10 +147,7 @@ async def movimientos_me(
     por_pagina: int = Query(default=20, ge=1, le=100),
     sesion: AsyncSession = Depends(get_sesion),
 ) -> MovimientosPaginados:
-    return await UsuariosServicio(sesion).listar_movimientos(
-        _uid(payload), pagina, por_pagina
-    )
-
+    return await UsuariosServicio(sesion).listar_movimientos(_uid(payload), pagina, por_pagina)
 
 
 @router.get(
@@ -174,7 +162,6 @@ async def perfil_me(
     return await UsuariosServicio(sesion).perfil_estadisticas(_uid(payload))
 
 
-
 @router.get(
     "/me/insignias",
     response_model=list[InsigniaRespuesta],
@@ -187,7 +174,6 @@ async def insignias_me(
     return await UsuariosServicio(sesion).listar_insignias(_uid(payload))
 
 
-
 @router.get(
     "/me/certificados",
     response_model=list[CertificadoRespuesta],
@@ -198,7 +184,6 @@ async def certificados_me(
     sesion: AsyncSession = Depends(get_sesion),
 ) -> list[CertificadoRespuesta]:
     return await UsuariosServicio(sesion).listar_certificados(_uid(payload))
-
 
 
 @router.get(

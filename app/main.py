@@ -24,6 +24,7 @@ from app.dominios.usuarios.router import router as usuarios_router
 async def verificar_conexion_db() -> bool:
     from sqlalchemy import text
     from app.core.db import _get_session_factory
+
     async with _get_session_factory()() as s:
         await s.execute(text("SELECT 1"))
     return True
@@ -72,7 +73,9 @@ def crear_app() -> FastAPI:
     app.add_exception_handler(ErrorNegocio, handler_error_negocio)  # type: ignore[arg-type]
 
     @app.exception_handler(RequestValidationError)
-    async def handler_error_validacion(request: Request, exc: RequestValidationError) -> JSONResponse:
+    async def handler_error_validacion(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         request_id = getattr(request.state, "request_id", "")
         campos = []
         for err in exc.errors():
@@ -109,6 +112,7 @@ def crear_app() -> FastAPI:
     @app.on_event("shutdown")
     async def shutdown() -> None:
         from app.core.redis_client import cerrar_redis
+
         await cerrar_engine()
         await cerrar_redis()
 

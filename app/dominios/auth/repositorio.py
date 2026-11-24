@@ -19,11 +19,8 @@ class AuthRepositorio:
     def __init__(self, sesion: AsyncSession) -> None:
         self._s = sesion
 
-
     async def buscar_por_correo(self, correo: str) -> Usuario | None:
-        resultado = await self._s.execute(
-            select(Usuario).where(Usuario.correo == correo)
-        )
+        resultado = await self._s.execute(select(Usuario).where(Usuario.correo == correo))
         return resultado.scalar_one_or_none()
 
     async def buscar_por_id(self, usuario_id: uuid.UUID) -> Usuario | None:
@@ -32,10 +29,8 @@ class AuthRepositorio:
     async def crear_usuario(self, usuario: Usuario) -> None:
         self._s.add(usuario)
 
-
     async def crear_consentimiento(self, consentimiento: Consentimiento) -> None:
         self._s.add(consentimiento)
-
 
     async def buscar_sesion_por_hash(self, token_hash: str) -> SesionRefresh | None:
         resultado = await self._s.execute(
@@ -58,9 +53,7 @@ class AuthRepositorio:
             .values(revocado_en=ahora, reemplazado_por=reemplazado_por)
         )
 
-    async def revocar_todas_sesiones_usuario(
-        self, usuario_id: uuid.UUID, ahora: datetime
-    ) -> None:
+    async def revocar_todas_sesiones_usuario(self, usuario_id: uuid.UUID, ahora: datetime) -> None:
         """Revoca toda la cadena de sesiones del usuario (reutilización de token / restablecer)."""
         await self._s.execute(
             update(SesionRefresh)
@@ -71,9 +64,7 @@ class AuthRepositorio:
             .values(revocado_en=ahora)
         )
 
-    async def revocar_cadena_de_sesion(
-        self, sesion_id: uuid.UUID, ahora: datetime
-    ) -> None:
+    async def revocar_cadena_de_sesion(self, sesion_id: uuid.UUID, ahora: datetime) -> None:
         """
         Cuando se detecta reutilización de un refresh token ya revocado,
         se revoca toda la cadena de sesiones de ese usuario (06 §3).
@@ -82,7 +73,6 @@ class AuthRepositorio:
         if sesion is None:
             return
         await self.revocar_todas_sesiones_usuario(sesion.usuario_id, ahora)
-
 
     async def buscar_restablecimiento_por_hash(
         self, token_hash: str

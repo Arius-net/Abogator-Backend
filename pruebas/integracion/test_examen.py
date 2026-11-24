@@ -71,16 +71,18 @@ def _crear_escenario_mock() -> dict:
     decisiones = []
     for i in range(1, 11):
         hc = 0 if i <= 3 else (6 if i <= 6 else (24 if i <= 8 else 72))
-        decisiones.append({
-            "orden": i,
-            "tarjeta_id": str(uuid.uuid4()),
-            "hora_crisis": hc,
-            "replica_jefe": f"Replica {i}",
-            "fundamentos": [
-                {"id": 1, "texto": "Fundamento Correcto", "es_correcta": True},
-                {"id": 2, "texto": "Fundamento Incorrecto", "es_correcta": False},
-            ],
-        })
+        decisiones.append(
+            {
+                "orden": i,
+                "tarjeta_id": str(uuid.uuid4()),
+                "hora_crisis": hc,
+                "replica_jefe": f"Replica {i}",
+                "fundamentos": [
+                    {"id": 1, "texto": "Fundamento Correcto", "es_correcta": True},
+                    {"id": 2, "texto": "Fundamento Incorrecto", "es_correcta": False},
+                ],
+            }
+        )
     return {
         "nombre_jefe": "Inspectora Vega",
         "titulo_crisis": "Brecha de Datos",
@@ -119,7 +121,20 @@ def _crear_tarjeta_examen(tid: uuid.UUID) -> Tarjeta:
 
 def test_iniciar_examen_exito():
     escenario = _crear_escenario_mock()
-    sprint = Sprint(id=6, modulo_id=1, orden=6, titulo="Examen Final", objetivo="Objetivo", es_examen=True, escenario_jefe=escenario, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    sprint = Sprint(
+        id=6,
+        modulo_id=1,
+        orden=6,
+        titulo="Examen Final",
+        objetivo="Objetivo",
+        es_examen=True,
+        escenario_jefe=escenario,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
     usuario = _crear_usuario()
 
     tid_primero = uuid.UUID(escenario["decisiones"][0]["tarjeta_id"])
@@ -147,7 +162,20 @@ def test_iniciar_examen_exito():
 
 def test_iniciar_examen_sprints_incompletos_retorna_403():
     escenario = _crear_escenario_mock()
-    sprint = Sprint(id=6, modulo_id=1, orden=6, titulo="Examen", objetivo="Objetivo", es_examen=True, escenario_jefe=escenario, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    sprint = Sprint(
+        id=6,
+        modulo_id=1,
+        orden=6,
+        titulo="Examen",
+        objetivo="Objetivo",
+        es_examen=True,
+        escenario_jefe=escenario,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
     usuario = _crear_usuario()
 
     sesion_mock = AsyncMock()
@@ -168,7 +196,20 @@ def test_responder_decision_examen_tiempo_agotado():
     tid = uuid.uuid4()
     usuario = _crear_usuario(vidas=5)
     escenario = _crear_escenario_mock()
-    sprint = Sprint(id=6, modulo_id=1, orden=6, titulo="Examen", objetivo="Objetivo", es_examen=True, escenario_jefe=escenario, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    sprint = Sprint(
+        id=6,
+        modulo_id=1,
+        orden=6,
+        titulo="Examen",
+        objetivo="Objetivo",
+        es_examen=True,
+        escenario_jefe=escenario,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
 
     entregada_hace_30s = ahora - timedelta(seconds=30)
     intento = Intento(
@@ -183,8 +224,20 @@ def test_responder_decision_examen_tiempo_agotado():
         ind_riesgo=25,
         hp_jefe=100,
         tarjetas_asignadas=[
-            {"orden": 1, "tarjeta_id": str(tid), "version": 1, "entregada_en": entregada_hace_30s.isoformat(), "pausa_s": 0},
-            {"orden": 2, "tarjeta_id": str(uuid.uuid4()), "version": 1, "entregada_en": None, "pausa_s": 0},
+            {
+                "orden": 1,
+                "tarjeta_id": str(tid),
+                "version": 1,
+                "entregada_en": entregada_hace_30s.isoformat(),
+                "pausa_s": 0,
+            },
+            {
+                "orden": 2,
+                "tarjeta_id": str(uuid.uuid4()),
+                "version": 1,
+                "entregada_en": None,
+                "pausa_s": 0,
+            },
         ],
     )
     tarjeta = _crear_tarjeta_examen(tid)
@@ -220,7 +273,20 @@ def test_contraargumento_acierto_reduce_hp():
     rid = uuid.uuid4()
     usuario = _crear_usuario(vidas=5)
     escenario = _crear_escenario_mock()
-    sprint = Sprint(id=6, modulo_id=1, orden=6, titulo="Examen", objetivo="Objetivo", es_examen=True, escenario_jefe=escenario, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    sprint = Sprint(
+        id=6,
+        modulo_id=1,
+        orden=6,
+        titulo="Examen",
+        objetivo="Objetivo",
+        es_examen=True,
+        escenario_jefe=escenario,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
 
     intento = Intento(
         id=uuid.uuid4(),
@@ -284,8 +350,23 @@ def test_contraargumento_derrota_jefe_emite_certificado_y_folio():
     usuario = _crear_usuario(vidas=5)
     escenario = _crear_escenario_mock()
     escenario["dano_por_golpe"] = 100
-    modulo = Modulo(id=1, numero=1, titulo="Mod 1", etapa_startup="Semilla", color_token="blue", activo=True)
-    sprint = Sprint(id=6, modulo_id=1, orden=6, titulo="Examen", objetivo="Objetivo", es_examen=True, escenario_jefe=escenario, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    modulo = Modulo(
+        id=1, numero=1, titulo="Mod 1", etapa_startup="Semilla", color_token="blue", activo=True
+    )
+    sprint = Sprint(
+        id=6,
+        modulo_id=1,
+        orden=6,
+        titulo="Examen",
+        objetivo="Objetivo",
+        es_examen=True,
+        escenario_jefe=escenario,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
 
     intento = Intento(
         id=uuid.uuid4(),
@@ -323,7 +404,16 @@ def test_contraargumento_derrota_jefe_emite_certificado_y_folio():
     servicio._repo.buscar_modulo = AsyncMock(return_value=modulo)
     servicio._repo.obtener_siguiente_folio_seq = AsyncMock(return_value=42)
     servicio._repo.crear_certificado = AsyncMock()
-    servicio._repo.buscar_progreso = AsyncMock(return_value=ProgresoSprint(usuario_id=USUARIO_ID_TEST, sprint_id=6, estado=EstadoProgreso.disponible, estrellas=0, mejor_aciertos=0, perfecto=False))
+    servicio._repo.buscar_progreso = AsyncMock(
+        return_value=ProgresoSprint(
+            usuario_id=USUARIO_ID_TEST,
+            sprint_id=6,
+            estado=EstadoProgreso.disponible,
+            estrellas=0,
+            mejor_aciertos=0,
+            perfecto=False,
+        )
+    )
     servicio._repo.desbloquear_siguiente_modulo = AsyncMock()
     servicio._repo.otorgar_insignia = AsyncMock(return_value=True)
     servicio._repo.crear_movimiento_economia = AsyncMock()
@@ -345,7 +435,13 @@ def test_contraargumento_derrota_jefe_emite_certificado_y_folio():
 
 def test_pausa_sin_tiempo_extendido_falla():
     usuario = _crear_usuario(tiempo_extendido=False)
-    intento = Intento(id=uuid.uuid4(), usuario_id=USUARIO_ID_TEST, sprint_id=6, tipo=TipoIntento.examen, estado=EstadoIntento.en_curso)
+    intento = Intento(
+        id=uuid.uuid4(),
+        usuario_id=USUARIO_ID_TEST,
+        sprint_id=6,
+        tipo=TipoIntento.examen,
+        estado=EstadoIntento.en_curso,
+    )
 
     sesion_mock = AsyncMock()
     servicio = JuegoServicio(sesion_mock)
@@ -362,7 +458,20 @@ def test_pausa_y_reanudar_exitoso():
     tid = uuid.uuid4()
     usuario = _crear_usuario(tiempo_extendido=True)
     escenario = _crear_escenario_mock()
-    sprint = Sprint(id=6, modulo_id=1, orden=6, titulo="Examen", objetivo="Objetivo", es_examen=True, escenario_jefe=escenario, ini_presupuesto=70, ini_reputacion=60, ini_velocidad=50, ini_riesgo=25, monedas_max=60)
+    sprint = Sprint(
+        id=6,
+        modulo_id=1,
+        orden=6,
+        titulo="Examen",
+        objetivo="Objetivo",
+        es_examen=True,
+        escenario_jefe=escenario,
+        ini_presupuesto=70,
+        ini_reputacion=60,
+        ini_velocidad=50,
+        ini_riesgo=25,
+        monedas_max=60,
+    )
     intento = Intento(
         id=uuid.uuid4(),
         usuario_id=USUARIO_ID_TEST,
@@ -371,7 +480,15 @@ def test_pausa_y_reanudar_exitoso():
         estado=EstadoIntento.en_curso,
         pausado_en=None,
         pausa_acumulada_s=0,
-        tarjetas_asignadas=[{"orden": 1, "tarjeta_id": str(tid), "version": 1, "entregada_en": ahora.isoformat(), "pausa_s": 0}],
+        tarjetas_asignadas=[
+            {
+                "orden": 1,
+                "tarjeta_id": str(tid),
+                "version": 1,
+                "entregada_en": ahora.isoformat(),
+                "pausa_s": 0,
+            }
+        ],
     )
     tarjeta = _crear_tarjeta_examen(tid)
 

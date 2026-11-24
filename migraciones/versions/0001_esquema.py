@@ -1,7 +1,7 @@
 """0001 esquema inicial
 
 Revision ID: 0001
-Revises: 
+Revises:
 Create Date: 2026-11-16
 
 Crea:
@@ -106,7 +106,13 @@ def upgrade() -> None:
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
         sa.Column("version", sa.Integer(), nullable=False, server_default=sa.text("1")),
         sa.Column("sprint_id", sa.Integer(), sa.ForeignKey("sprints.id"), nullable=False),
-        sa.Column("tipo", postgresql.ENUM("normal", "evidencia", "justificacion", name="tipo_tarjeta", create_type=False), nullable=False),
+        sa.Column(
+            "tipo",
+            postgresql.ENUM(
+                "normal", "evidencia", "justificacion", name="tipo_tarjeta", create_type=False
+            ),
+            nullable=False,
+        ),
         sa.Column("categoria", sa.String(60), nullable=False),
         sa.Column("personaje_nombre", sa.String(60), nullable=False),
         sa.Column("personaje_rol", sa.String(60), nullable=False),
@@ -117,11 +123,14 @@ def upgrade() -> None:
         sa.Column("array_palabras_trampa", postgresql.ARRAY(sa.Text()), nullable=True),
         sa.Column("contenido_interactivo", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("activa", sa.Boolean(), nullable=False, server_default=sa.text("false")),
-        sa.Column("actualizado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "actualizado_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
     )
-    op.create_index(
-        "ix_tarjetas_sprint_activa_tipo", "tarjetas", ["sprint_id", "activa", "tipo"]
-    )
+    op.create_index("ix_tarjetas_sprint_activa_tipo", "tarjetas", ["sprint_id", "activa", "tipo"])
 
     # ── Tabla: usuarios ────────────────────────────────────────────────────────
     op.create_table(
@@ -130,12 +139,41 @@ def upgrade() -> None:
         sa.Column("nombre", sa.String(80), nullable=False),
         sa.Column("correo", postgresql.CITEXT(), nullable=False, unique=True),
         sa.Column("hash_contrasena", sa.String(72), nullable=False),
-        sa.Column("perfil", postgresql.ENUM("estudiante", "desarrollador", "legal", name="perfil_usuario", create_type=False), nullable=False, server_default=sa.text("'desarrollador'")),
-        sa.Column("rol", postgresql.ENUM("jugador", "admin", name="rol_usuario", create_type=False), nullable=False, server_default=sa.text("'jugador'")),
-        sa.Column("estado_cuenta", postgresql.ENUM("activo", "suspendido", "pendiente_borrado", name="estado_cuenta", create_type=False), nullable=False, server_default=sa.text("'activo'")),
-        sa.Column("zona_horaria", sa.String(60), nullable=False, server_default=sa.text("'America/Mexico_City'")),
+        sa.Column(
+            "perfil",
+            postgresql.ENUM(
+                "estudiante", "desarrollador", "legal", name="perfil_usuario", create_type=False
+            ),
+            nullable=False,
+            server_default=sa.text("'desarrollador'"),
+        ),
+        sa.Column(
+            "rol",
+            postgresql.ENUM("jugador", "admin", name="rol_usuario", create_type=False),
+            nullable=False,
+            server_default=sa.text("'jugador'"),
+        ),
+        sa.Column(
+            "estado_cuenta",
+            postgresql.ENUM(
+                "activo", "suspendido", "pendiente_borrado", name="estado_cuenta", create_type=False
+            ),
+            nullable=False,
+            server_default=sa.text("'activo'"),
+        ),
+        sa.Column(
+            "zona_horaria",
+            sa.String(60),
+            nullable=False,
+            server_default=sa.text("'America/Mexico_City'"),
+        ),
         sa.Column("vidas", sa.SmallInteger(), nullable=False, server_default=sa.text("5")),
-        sa.Column("vidas_base_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "vidas_base_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
         sa.Column("monedas", sa.Integer(), nullable=False, server_default=sa.text("0")),
         sa.Column("xp", sa.Integer(), nullable=False, server_default=sa.text("0")),
         sa.Column("nivel", sa.SmallInteger(), nullable=False, server_default=sa.text("1")),
@@ -147,7 +185,9 @@ def upgrade() -> None:
         sa.Column("preferencias", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("inventario", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("reto_diario", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")
+        ),
         sa.Column("ultimo_acceso", sa.DateTime(timezone=True), nullable=True),
         sa.Column("eliminado_en", sa.DateTime(timezone=True), nullable=True),
         sa.CheckConstraint("vidas BETWEEN 0 AND 5", name="ck_usuarios_vidas"),
@@ -161,10 +201,20 @@ def upgrade() -> None:
     op.create_table(
         "consentimientos",
         sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("documento", sa.String(30), nullable=False),
         sa.Column("version", sa.String(20), nullable=False),
-        sa.Column("aceptado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "aceptado_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
         sa.Column("ip", postgresql.INET(), nullable=True),
     )
 
@@ -172,10 +222,17 @@ def upgrade() -> None:
     op.create_table(
         "sesiones_refresh",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("token_hash", sa.String(64), nullable=False, unique=True),
         sa.Column("dispositivo", sa.String(80), nullable=True),
-        sa.Column("creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")
+        ),
         sa.Column("expira_en", sa.DateTime(timezone=True), nullable=False),
         sa.Column("revocado_en", sa.DateTime(timezone=True), nullable=True),
         sa.Column("reemplazado_por", postgresql.UUID(as_uuid=True), nullable=True),
@@ -186,7 +243,12 @@ def upgrade() -> None:
     op.create_table(
         "restablecimientos_contrasena",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("token_hash", sa.String(64), nullable=False, unique=True),
         sa.Column("expira_en", sa.DateTime(timezone=True), nullable=False),
         sa.Column("usado_en", sa.DateTime(timezone=True), nullable=True),
@@ -196,19 +258,41 @@ def upgrade() -> None:
     op.create_table(
         "dispositivos_push",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("plataforma", sa.String(10), nullable=False),
         sa.Column("token", sa.Text(), nullable=False, unique=True),
         sa.Column("activo", sa.Boolean(), nullable=False, server_default=sa.text("true")),
-        sa.Column("actualizado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "actualizado_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
     )
 
     # ── Tabla: progreso_sprints ────────────────────────────────────────────────
     op.create_table(
         "progreso_sprints",
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), primary_key=True),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            primary_key=True,
+        ),
         sa.Column("sprint_id", sa.Integer(), sa.ForeignKey("sprints.id"), primary_key=True),
-        sa.Column("estado", postgresql.ENUM("bloqueado", "disponible", "completado", name="estado_progreso", create_type=False), nullable=False, server_default=sa.text("'bloqueado'")),
+        sa.Column(
+            "estado",
+            postgresql.ENUM(
+                "bloqueado", "disponible", "completado", name="estado_progreso", create_type=False
+            ),
+            nullable=False,
+            server_default=sa.text("'bloqueado'"),
+        ),
         sa.Column("estrellas", sa.SmallInteger(), nullable=False, server_default=sa.text("0")),
         sa.Column("mejor_aciertos", sa.SmallInteger(), nullable=False, server_default=sa.text("0")),
         sa.Column("perfecto", sa.Boolean(), nullable=False, server_default=sa.text("false")),
@@ -219,11 +303,36 @@ def upgrade() -> None:
     # ── Tabla: intentos ────────────────────────────────────────────────────────
     op.create_table(
         "intentos",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),  # sin default; lo pone el cliente
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "id", postgresql.UUID(as_uuid=True), primary_key=True
+        ),  # sin default; lo pone el cliente
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("sprint_id", sa.Integer(), sa.ForeignKey("sprints.id"), nullable=False),
-        sa.Column("tipo", postgresql.ENUM("sprint", "examen", name="tipo_intento", create_type=False), nullable=False),
-        sa.Column("estado", postgresql.ENUM("en_curso", "completado", "quebrado", "aprobado", "reprobado", "abandonado", name="estado_intento", create_type=False), nullable=False, server_default=sa.text("'en_curso'")),
+        sa.Column(
+            "tipo",
+            postgresql.ENUM("sprint", "examen", name="tipo_intento", create_type=False),
+            nullable=False,
+        ),
+        sa.Column(
+            "estado",
+            postgresql.ENUM(
+                "en_curso",
+                "completado",
+                "quebrado",
+                "aprobado",
+                "reprobado",
+                "abandonado",
+                name="estado_intento",
+                create_type=False,
+            ),
+            nullable=False,
+            server_default=sa.text("'en_curso'"),
+        ),
         sa.Column("ind_presupuesto", sa.SmallInteger(), nullable=False),
         sa.Column("ind_reputacion", sa.SmallInteger(), nullable=False),
         sa.Column("ind_velocidad", sa.SmallInteger(), nullable=False),
@@ -235,16 +344,25 @@ def upgrade() -> None:
         sa.Column("xp_ganada", sa.Integer(), nullable=False, server_default=sa.text("0")),
         sa.Column("monedas_ganadas", sa.Integer(), nullable=False, server_default=sa.text("0")),
         sa.Column("tarjetas_asignadas", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("marcado_revision", sa.Boolean(), nullable=False, server_default=sa.text("false")),
+        sa.Column(
+            "marcado_revision", sa.Boolean(), nullable=False, server_default=sa.text("false")
+        ),
         sa.Column("pausado_en", sa.DateTime(timezone=True), nullable=True),
         sa.Column("pausa_acumulada_s", sa.Integer(), nullable=False, server_default=sa.text("0")),
-        sa.Column("iniciado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "iniciado_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
         sa.Column("terminado_en", sa.DateTime(timezone=True), nullable=True),
         sa.CheckConstraint("ind_presupuesto BETWEEN 0 AND 100", name="ck_intentos_ind_presupuesto"),
         sa.CheckConstraint("ind_reputacion BETWEEN 0 AND 100", name="ck_intentos_ind_reputacion"),
         sa.CheckConstraint("ind_velocidad BETWEEN 0 AND 100", name="ck_intentos_ind_velocidad"),
         sa.CheckConstraint("ind_riesgo BETWEEN 0 AND 100", name="ck_intentos_ind_riesgo"),
-        sa.CheckConstraint("hp_jefe IS NULL OR hp_jefe BETWEEN 0 AND 100", name="ck_intentos_hp_jefe"),
+        sa.CheckConstraint(
+            "hp_jefe IS NULL OR hp_jefe BETWEEN 0 AND 100", name="ck_intentos_hp_jefe"
+        ),
         sa.CheckConstraint("pausa_acumulada_s >= 0", name="ck_intentos_pausa_acumulada_s"),
     )
     op.create_index("ix_intentos_usuario_id", "intentos", ["usuario_id"])
@@ -256,11 +374,40 @@ def upgrade() -> None:
     # ── Tabla: respuestas ──────────────────────────────────────────────────────
     op.create_table(
         "respuestas",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),  # sin default; lo pone el cliente
-        sa.Column("intento_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("intentos.id"), nullable=False),
-        sa.Column("tarjeta_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("tarjetas.id"), nullable=False),
-        sa.Column("veredicto", postgresql.ENUM("legal", "ilegal", "condicional", "escalar", name="veredicto", create_type=False), nullable=True),
-        sa.Column("resultado", postgresql.ENUM("correcto", "parcial", "incorrecto", "tiempo_agotado", name="resultado_respuesta", create_type=False), nullable=False),
+        sa.Column(
+            "id", postgresql.UUID(as_uuid=True), primary_key=True
+        ),  # sin default; lo pone el cliente
+        sa.Column(
+            "intento_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("intentos.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tarjeta_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("tarjetas.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "veredicto",
+            postgresql.ENUM(
+                "legal", "ilegal", "condicional", "escalar", name="veredicto", create_type=False
+            ),
+            nullable=True,
+        ),
+        sa.Column(
+            "resultado",
+            postgresql.ENUM(
+                "correcto",
+                "parcial",
+                "incorrecto",
+                "tiempo_agotado",
+                name="resultado_respuesta",
+                create_type=False,
+            ),
+            nullable=False,
+        ),
         sa.Column("segundos", sa.Numeric(5, 2), nullable=True),
         sa.Column("por_que_ok", sa.Boolean(), nullable=True),
         sa.Column("evidencia_ok", sa.Boolean(), nullable=True),
@@ -275,7 +422,12 @@ def upgrade() -> None:
         sa.Column("monedas", sa.Integer(), nullable=False, server_default=sa.text("0")),
         sa.Column("vidas_delta", sa.SmallInteger(), nullable=False, server_default=sa.text("0")),
         sa.Column("respondido_en", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("recibido_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "recibido_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
         sa.UniqueConstraint("intento_id", "tarjeta_id", name="uq_respuestas_intento_tarjeta"),
     )
     op.create_index("ix_respuestas_intento_id", "respuestas", ["intento_id"])
@@ -284,11 +436,25 @@ def upgrade() -> None:
     op.create_table(
         "comodines",
         sa.Column("id", sa.SmallInteger(), primary_key=True, autoincrement=True),
-        sa.Column("clave", postgresql.ENUM("lupa", "abogado", "amparo", "congelar_racha", name="tipo_comodin", create_type=False), nullable=False, unique=True),
+        sa.Column(
+            "clave",
+            postgresql.ENUM(
+                "lupa",
+                "abogado",
+                "amparo",
+                "congelar_racha",
+                name="tipo_comodin",
+                create_type=False,
+            ),
+            nullable=False,
+            unique=True,
+        ),
         sa.Column("nombre", sa.String(40), nullable=False),
         sa.Column("descripcion", sa.Text(), nullable=False),
         sa.Column("precio", sa.Integer(), nullable=False),
-        sa.Column("permitido_en_examen", sa.Boolean(), nullable=False, server_default=sa.text("false")),
+        sa.Column(
+            "permitido_en_examen", sa.Boolean(), nullable=False, server_default=sa.text("false")
+        ),
         sa.Column("activo", sa.Boolean(), nullable=False, server_default=sa.text("true")),
     )
 
@@ -296,14 +462,21 @@ def upgrade() -> None:
     op.create_table(
         "movimientos_economia",
         sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("recurso", sa.String(10), nullable=False),
         sa.Column("cantidad", sa.Integer(), nullable=False),
         sa.Column("saldo_resultante", sa.Integer(), nullable=False),
         sa.Column("motivo", sa.String(30), nullable=False),
         sa.Column("detalle", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("referencia_id", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column("creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")
+        ),
         sa.CheckConstraint("recurso IN ('vidas', 'monedas', 'xp')", name="ck_movimientos_recurso"),
     )
     op.create_index("ix_movimientos_hist", "movimientos_economia", ["usuario_id", "creado_en"])
@@ -312,17 +485,43 @@ def upgrade() -> None:
     op.create_table(
         "apelaciones",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
-        sa.Column("tarjeta_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("tarjetas.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tarjeta_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("tarjetas.id"),
+            nullable=False,
+        ),
         sa.Column("tarjeta_version", sa.Integer(), nullable=False),
-        sa.Column("respuesta_origen_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("respuestas.id"), nullable=True),
+        sa.Column(
+            "respuesta_origen_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("respuestas.id"),
+            nullable=True,
+        ),
         sa.Column("etapa", sa.SmallInteger(), nullable=False, server_default=sa.text("1")),
         sa.Column("proxima_revision", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("estado", postgresql.ENUM("pendiente", "ganada", "cerrada", name="estado_apelacion", create_type=False), nullable=False, server_default=sa.text("'pendiente'")),
-        sa.Column("creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "estado",
+            postgresql.ENUM(
+                "pendiente", "ganada", "cerrada", name="estado_apelacion", create_type=False
+            ),
+            nullable=False,
+            server_default=sa.text("'pendiente'"),
+        ),
+        sa.Column(
+            "creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")
+        ),
         sa.CheckConstraint("etapa BETWEEN 1 AND 3", name="ck_apelaciones_etapa"),
     )
-    op.create_index("ix_apelaciones_buzon", "apelaciones", ["usuario_id", "estado", "proxima_revision"])
+    op.create_index(
+        "ix_apelaciones_buzon", "apelaciones", ["usuario_id", "estado", "proxima_revision"]
+    )
     # Índice único parcial: solo una apelación pendiente por usuario+tarjeta
     op.execute(
         "CREATE UNIQUE INDEX ix_apelacion_abierta ON apelaciones (usuario_id, tarjeta_id) WHERE estado = 'pendiente'"
@@ -331,19 +530,53 @@ def upgrade() -> None:
     # ── Tabla: juicios_apelacion ───────────────────────────────────────────────
     op.create_table(
         "juicios_apelacion",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),  # sin default; lo pone el cliente
-        sa.Column("apelacion_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("apelaciones.id"), nullable=False),
-        sa.Column("veredicto", postgresql.ENUM("legal", "ilegal", "condicional", "escalar", name="veredicto", create_type=False), nullable=True),
-        sa.Column("resultado", postgresql.ENUM("correcto", "parcial", "incorrecto", "tiempo_agotado", name="resultado_respuesta", create_type=False), nullable=False),
+        sa.Column(
+            "id", postgresql.UUID(as_uuid=True), primary_key=True
+        ),  # sin default; lo pone el cliente
+        sa.Column(
+            "apelacion_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("apelaciones.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "veredicto",
+            postgresql.ENUM(
+                "legal", "ilegal", "condicional", "escalar", name="veredicto", create_type=False
+            ),
+            nullable=True,
+        ),
+        sa.Column(
+            "resultado",
+            postgresql.ENUM(
+                "correcto",
+                "parcial",
+                "incorrecto",
+                "tiempo_agotado",
+                name="resultado_respuesta",
+                create_type=False,
+            ),
+            nullable=False,
+        ),
         sa.Column("vida_recuperada", sa.Boolean(), nullable=False, server_default=sa.text("false")),
-        sa.Column("resuelto_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "resuelto_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
     )
 
     # ── Tabla: notificaciones ──────────────────────────────────────────────────
     op.create_table(
         "notificaciones",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("tipo", sa.String(20), nullable=False),
         sa.Column("titulo", sa.String(80), nullable=False),
         sa.Column("cuerpo", sa.String(200), nullable=False),
@@ -352,7 +585,9 @@ def upgrade() -> None:
         sa.Column("enviada_en", sa.DateTime(timezone=True), nullable=True),
         sa.Column("estado", sa.String(12), nullable=False, server_default=sa.text("'pendiente'")),
     )
-    op.create_index("ix_notificaciones_estado_programada", "notificaciones", ["estado", "programada_para"])
+    op.create_index(
+        "ix_notificaciones_estado_programada", "notificaciones", ["estado", "programada_para"]
+    )
 
     # ── Tabla: insignias ───────────────────────────────────────────────────────
     op.create_table(
@@ -367,20 +602,47 @@ def upgrade() -> None:
     # ── Tabla: usuario_insignias ───────────────────────────────────────────────
     op.create_table(
         "usuario_insignias",
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), primary_key=True),
-        sa.Column("insignia_id", sa.SmallInteger(), sa.ForeignKey("insignias.id"), primary_key=True),
-        sa.Column("obtenida_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            primary_key=True,
+        ),
+        sa.Column(
+            "insignia_id", sa.SmallInteger(), sa.ForeignKey("insignias.id"), primary_key=True
+        ),
+        sa.Column(
+            "obtenida_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
     )
 
     # ── Tabla: certificados ────────────────────────────────────────────────────
     op.create_table(
         "certificados",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("usuario_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "usuario_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("usuarios.id"),
+            nullable=False,
+        ),
         sa.Column("modulo_id", sa.SmallInteger(), sa.ForeignKey("modulos.id"), nullable=False),
-        sa.Column("intento_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("intentos.id"), nullable=False),
+        sa.Column(
+            "intento_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("intentos.id"),
+            nullable=False,
+        ),
         sa.Column("folio", sa.String(20), nullable=False, unique=True),
-        sa.Column("emitido_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "emitido_en",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("now()"),
+        ),
         sa.UniqueConstraint("usuario_id", "modulo_id", name="uq_certificados_usuario_modulo"),
     )
 
@@ -388,12 +650,16 @@ def upgrade() -> None:
     op.create_table(
         "auditoria_admin",
         sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
-        sa.Column("admin_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False),
+        sa.Column(
+            "admin_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("usuarios.id"), nullable=False
+        ),
         sa.Column("entidad", sa.String(40), nullable=False),
         sa.Column("entidad_id", sa.String(40), nullable=False),
         sa.Column("accion", sa.String(20), nullable=False),
         sa.Column("cambios", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column(
+            "creado_en", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")
+        ),
     )
 
 
@@ -430,9 +696,17 @@ def downgrade() -> None:
 
     # Eliminar tipos ENUM
     for tipo in [
-        "estado_apelacion", "tipo_comodin", "estado_progreso", "estado_intento",
-        "tipo_intento", "tipo_tarjeta", "resultado_respuesta", "veredicto",
-        "estado_cuenta", "rol_usuario", "perfil_usuario",
+        "estado_apelacion",
+        "tipo_comodin",
+        "estado_progreso",
+        "estado_intento",
+        "tipo_intento",
+        "tipo_tarjeta",
+        "resultado_respuesta",
+        "veredicto",
+        "estado_cuenta",
+        "rol_usuario",
+        "perfil_usuario",
     ]:
         op.execute(f"DROP TYPE IF EXISTS {tipo}")
 

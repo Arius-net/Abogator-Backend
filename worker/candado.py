@@ -6,9 +6,7 @@ from app.core.config import get_config
 
 
 @asynccontextmanager
-async def candado_redis(
-    clave: str, ttl_segundos: int = 60
-) -> AsyncGenerator[bool, None]:
+async def candado_redis(clave: str, ttl_segundos: int = 60) -> AsyncGenerator[bool, None]:
     try:
         import redis.asyncio as aioredis
 

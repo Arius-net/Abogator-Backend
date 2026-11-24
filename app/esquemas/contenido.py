@@ -88,17 +88,23 @@ class ContenidoInteractivo(_Base):
             if self.evidencia is not None:
                 raise ValueError("Las tarjetas de tipo normal no deben incluir evidencia.")
             if self.micro_pregunta.tipo != "por_que":
-                raise ValueError("Las tarjetas de tipo normal deben tener micro pregunta 'por_que'.")
+                raise ValueError(
+                    "Las tarjetas de tipo normal deben tener micro pregunta 'por_que'."
+                )
         elif tipo == "evidencia":
             if self.evidencia is None or not self.evidencia.requerida:
                 raise ValueError("Las tarjetas de tipo evidencia requieren el bloque evidencia.")
             if self.micro_pregunta.tipo != "por_que":
-                raise ValueError("Las tarjetas de tipo evidencia deben tener micro pregunta 'por_que'.")
+                raise ValueError(
+                    "Las tarjetas de tipo evidencia deben tener micro pregunta 'por_que'."
+                )
         elif tipo == "justificacion":
             if self.evidencia is not None:
                 raise ValueError("Las tarjetas de tipo justificacion no deben incluir evidencia.")
             if self.micro_pregunta.tipo != "justificacion":
-                raise ValueError("Las tarjetas de tipo justificacion deben tener micro pregunta 'justificacion'.")
+                raise ValueError(
+                    "Las tarjetas de tipo justificacion deben tener micro pregunta 'justificacion'."
+                )
         else:
             raise ValueError(f"Tipo de tarjeta desconocido: {tipo}")
 

@@ -22,6 +22,7 @@ def mock_sesion_db() -> Generator[None, None, None]:
     Sustituye get_sesion por un AsyncMock en todas las pruebas
     para evitar intentar cargar asyncpg o conectar a PostgreSQL.
     """
+
     async def _mock_sesion():
         yield AsyncMock()
 

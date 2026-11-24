@@ -19,18 +19,50 @@ from app.modelos.enums import TipoTarjeta
 def _crear_datos_tarjeta(sprint_id: int, tipo: TipoTarjeta, numero: int) -> dict:
     ci = {
         "veredictos": {
-            "legal": {"resultado": "incorrecto", "d_presupuesto": 0, "d_reputacion": -5, "d_velocidad": 10, "d_riesgo": 25},
-            "ilegal": {"resultado": "correcto", "d_presupuesto": -5, "d_reputacion": 5, "d_velocidad": -10, "d_riesgo": -20},
-            "condicional": {"resultado": "parcial", "d_presupuesto": 0, "d_reputacion": 0, "d_velocidad": 0, "d_riesgo": 5},
-            "escalar": {"resultado": "incorrecto", "d_presupuesto": -10, "d_reputacion": 0, "d_velocidad": -5, "d_riesgo": 0},
+            "legal": {
+                "resultado": "incorrecto",
+                "d_presupuesto": 0,
+                "d_reputacion": -5,
+                "d_velocidad": 10,
+                "d_riesgo": 25,
+            },
+            "ilegal": {
+                "resultado": "correcto",
+                "d_presupuesto": -5,
+                "d_reputacion": 5,
+                "d_velocidad": -10,
+                "d_riesgo": -20,
+            },
+            "condicional": {
+                "resultado": "parcial",
+                "d_presupuesto": 0,
+                "d_reputacion": 0,
+                "d_velocidad": 0,
+                "d_riesgo": 5,
+            },
+            "escalar": {
+                "resultado": "incorrecto",
+                "d_presupuesto": -10,
+                "d_reputacion": 0,
+                "d_velocidad": -5,
+                "d_riesgo": 0,
+            },
         },
         "evidencia": None,
         "micro_pregunta": {
             "tipo": "por_que",
             "enunciado": "Por que esta accion es contraria a la ley de privacidad?",
             "opciones": [
-                {"id": 1, "texto": "Vulnera el consentimiento informado y el principio de proporcionalidad.", "es_correcta": True},
-                {"id": 2, "texto": "Porque la empresa debe reducir costos de servidores.", "es_correcta": False},
+                {
+                    "id": 1,
+                    "texto": "Vulnera el consentimiento informado y el principio de proporcionalidad.",
+                    "es_correcta": True,
+                },
+                {
+                    "id": 2,
+                    "texto": "Porque la empresa debe reducir costos de servidores.",
+                    "es_correcta": False,
+                },
             ],
         },
     }
@@ -48,7 +80,11 @@ def _crear_datos_tarjeta(sprint_id: int, tipo: TipoTarjeta, numero: int) -> dict
             "enunciado": "Que linea de codigo implementa la captura no autorizada?",
             "opciones": [
                 {"id": 1, "texto": "tracker.recordKeystrokes() en linea 2", "es_correcta": True},
-                {"id": 2, "texto": "const tracker = new Analytics() en linea 1", "es_correcta": False},
+                {
+                    "id": 2,
+                    "texto": "const tracker = new Analytics() en linea 1",
+                    "es_correcta": False,
+                },
             ],
         }
     elif tipo == TipoTarjeta.justificacion:
@@ -108,11 +144,17 @@ async def seed() -> None:
             just_existentes = sum(1 for t in existentes if t.tipo == TipoTarjeta.justificacion)
 
             for i in range(normales_existentes + 1, 7 + 1):
-                tarjetas_a_crear.append(Tarjeta(**_crear_datos_tarjeta(sprint_id, TipoTarjeta.normal, i)))
+                tarjetas_a_crear.append(
+                    Tarjeta(**_crear_datos_tarjeta(sprint_id, TipoTarjeta.normal, i))
+                )
             for i in range(evidencias_existentes + 1, 3 + 1):
-                tarjetas_a_crear.append(Tarjeta(**_crear_datos_tarjeta(sprint_id, TipoTarjeta.evidencia, i + 6)))
+                tarjetas_a_crear.append(
+                    Tarjeta(**_crear_datos_tarjeta(sprint_id, TipoTarjeta.evidencia, i + 6))
+                )
             for i in range(just_existentes + 1, 1 + 1):
-                tarjetas_a_crear.append(Tarjeta(**_crear_datos_tarjeta(sprint_id, TipoTarjeta.justificacion, 10)))
+                tarjetas_a_crear.append(
+                    Tarjeta(**_crear_datos_tarjeta(sprint_id, TipoTarjeta.justificacion, 10))
+                )
 
             if tarjetas_a_crear:
                 sesion.add_all(tarjetas_a_crear)
@@ -126,21 +168,41 @@ async def seed() -> None:
                 escenario = {
                     "titulo": f"Crisis de Filtracion en Startup FinTech (Sprint {examen_id})",
                     "descripcion": "El sistema central ha sufrido un incidente de seguridad con riesgo de exfiltracion.",
-                    "jefe": {"nombre": "Lic. Rodrigo Voraz", "avatar_url": "boss.png", "hp_maximo": 100},
+                    "jefe": {
+                        "nombre": "Lic. Rodrigo Voraz",
+                        "avatar_url": "boss.png",
+                        "hp_maximo": 100,
+                    },
                     "decisiones": [
                         {
                             "id": "dec_1",
                             "hora_crisis": 0,
                             "situacion": "Se detectan accesos anomalos a la base de datos de usuarios.",
                             "opciones": [
-                                {"id": "op_1", "texto": "Desconectar servidores afectados inmediatamente", "es_correcta": True},
-                                {"id": "op_2", "texto": "Ignorar la alerta hasta el lunes", "es_correcta": False},
+                                {
+                                    "id": "op_1",
+                                    "texto": "Desconectar servidores afectados inmediatamente",
+                                    "es_correcta": True,
+                                },
+                                {
+                                    "id": "op_2",
+                                    "texto": "Ignorar la alerta hasta el lunes",
+                                    "es_correcta": False,
+                                },
                             ],
                             "tiempo_segundos": 30,
                             "replica_jefe": "En que te basas para interrumpir las operaciones productivas?",
                             "contraargumentos": [
-                                {"id": "fund_1", "texto": "Principio de contencion y mitigacion de dano", "es_valido": True},
-                                {"id": "fund_2", "texto": "Para ahorrar consumo de energia electrica", "es_valido": False},
+                                {
+                                    "id": "fund_1",
+                                    "texto": "Principio de contencion y mitigacion de dano",
+                                    "es_valido": True,
+                                },
+                                {
+                                    "id": "fund_2",
+                                    "texto": "Para ahorrar consumo de energia electrica",
+                                    "es_valido": False,
+                                },
                             ],
                         }
                     ],

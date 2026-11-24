@@ -6,10 +6,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-
 class _Base(BaseModel):
     model_config = ConfigDict(extra="forbid")
-
 
 
 class Preferencias(_Base):
@@ -29,7 +27,6 @@ class Preferencias(_Base):
         return cls()
 
 
-
 class Inventario(_Base):
     lupa: int = Field(default=0, ge=0)
     abogado: int = Field(default=0, ge=0)
@@ -41,7 +38,6 @@ class Inventario(_Base):
         return cls()
 
 
-
 TipoReto = Literal[
     "aciertos_seguidos",
     "sprints_completados",
@@ -50,10 +46,30 @@ TipoReto = Literal[
 ]
 
 _PLANTILLAS: list[dict[str, Any]] = [
-    {"tipo": "aciertos_seguidos",        "descripcion": "Acierta 3 tarjetas seguidas",   "meta": 3,  "recompensa_monedas": 15},
-    {"tipo": "sprints_completados",       "descripcion": "Completa 1 sprint",             "meta": 1,  "recompensa_monedas": 15},
-    {"tipo": "por_que_correctos",         "descripcion": 'Acierta 2 "¿Por qué?"',         "meta": 2,  "recompensa_monedas": 15},
-    {"tipo": "evidencias_inspeccionadas", "descripcion": "Inspecciona 1 evidencia",        "meta": 1,  "recompensa_monedas": 15},
+    {
+        "tipo": "aciertos_seguidos",
+        "descripcion": "Acierta 3 tarjetas seguidas",
+        "meta": 3,
+        "recompensa_monedas": 15,
+    },
+    {
+        "tipo": "sprints_completados",
+        "descripcion": "Completa 1 sprint",
+        "meta": 1,
+        "recompensa_monedas": 15,
+    },
+    {
+        "tipo": "por_que_correctos",
+        "descripcion": 'Acierta 2 "¿Por qué?"',
+        "meta": 2,
+        "recompensa_monedas": 15,
+    },
+    {
+        "tipo": "evidencias_inspeccionadas",
+        "descripcion": "Inspecciona 1 evidencia",
+        "meta": 1,
+        "recompensa_monedas": 15,
+    },
 ]
 
 
@@ -82,7 +98,6 @@ class RetoDiario(_Base):
         )
 
 
-
 class DetalleMovimiento(_Base):
     model_config = ConfigDict(extra="forbid")
 
@@ -93,7 +108,6 @@ class DetalleMovimiento(_Base):
     precio_unitario: int | None = None
     bonos: list[str] | None = None
     estado_intento: str | None = None
-
 
 
 class CambiosAuditoria(_Base):

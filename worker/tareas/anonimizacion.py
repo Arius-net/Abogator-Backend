@@ -36,12 +36,8 @@ async def tarea_anonimizacion(sesion: AsyncSession) -> int:
             u.correo = f"eliminado+{u.id}@anon.invalid"
             u.hash_contrasena = "*"
 
-            await sesion.execute(
-                delete(DispositivoPush).where(DispositivoPush.usuario_id == u.id)
-            )
-            await sesion.execute(
-                delete(SesionRefresh).where(SesionRefresh.usuario_id == u.id)
-            )
+            await sesion.execute(delete(DispositivoPush).where(DispositivoPush.usuario_id == u.id))
+            await sesion.execute(delete(SesionRefresh).where(SesionRefresh.usuario_id == u.id))
 
         if usuarios:
             await sesion.commit()

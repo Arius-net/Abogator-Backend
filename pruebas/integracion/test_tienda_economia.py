@@ -79,23 +79,80 @@ def _crear_usuario(
         racha_maxima=racha_actual,
         ultimo_dia_racha=ultimo_dia_racha,
         zona_horaria="America/Mexico_City",
-        preferencias={"modo_oscuro": False, "escala_texto": 1.0, "etiquetas_lector": False, "botones_en_lugar_de_deslizar": False, "haptica": True, "tiempo_extendido": False, "reducir_animaciones": False, "notif_racha": True, "notif_apelaciones": True, "notif_vidas": True},
+        preferencias={
+            "modo_oscuro": False,
+            "escala_texto": 1.0,
+            "etiquetas_lector": False,
+            "botones_en_lugar_de_deslizar": False,
+            "haptica": True,
+            "tiempo_extendido": False,
+            "reducir_animaciones": False,
+            "notif_racha": True,
+            "notif_apelaciones": True,
+            "notif_vidas": True,
+        },
         inventario=inventario,
-        reto_diario={"fecha_reto": "2026-11-21", "tipo": "sprints_completados", "meta": 1, "avance": 0, "completado": False, "recompensa_monedas": 15},
+        reto_diario={
+            "fecha_reto": "2026-11-21",
+            "tipo": "sprints_completados",
+            "meta": 1,
+            "avance": 0,
+            "completado": False,
+            "recompensa_monedas": 15,
+        },
         estado_cuenta=EstadoCuenta.activo,
     )
 
 
 def test_catalogo_tienda():
-    c1 = Comodin(clave=TipoComodin.lupa, nombre="Lupa de Auditor", descripcion="Ver trampas", precio=60, permitido_en_examen=False, activo=True)
-    c2 = Comodin(clave=TipoComodin.abogado, nombre="Abogado Senior", descripcion="Ver nota", precio=90, permitido_en_examen=False, activo=True)
-    c3 = Comodin(clave=TipoComodin.amparo, nombre="Amparo", descripcion="Evita perder vida", precio=120, permitido_en_examen=False, activo=True)
+    c1 = Comodin(
+        clave=TipoComodin.lupa,
+        nombre="Lupa de Auditor",
+        descripcion="Ver trampas",
+        precio=60,
+        permitido_en_examen=False,
+        activo=True,
+    )
+    c2 = Comodin(
+        clave=TipoComodin.abogado,
+        nombre="Abogado Senior",
+        descripcion="Ver nota",
+        precio=90,
+        permitido_en_examen=False,
+        activo=True,
+    )
+    c3 = Comodin(
+        clave=TipoComodin.amparo,
+        nombre="Amparo",
+        descripcion="Evita perder vida",
+        precio=120,
+        permitido_en_examen=False,
+        activo=True,
+    )
 
     with patch.object(TiendaServicio, "listar_catalogo", new_callable=AsyncMock) as mock_list:
         mock_list.return_value = [
-            {"clave": "lupa", "nombre": "Lupa de Auditor", "descripcion": "Ver trampas", "precio": 60, "permitido_en_examen": False},
-            {"clave": "abogado", "nombre": "Abogado Senior", "descripcion": "Ver nota", "precio": 90, "permitido_en_examen": False},
-            {"clave": "amparo", "nombre": "Amparo", "descripcion": "Evita perder vida", "precio": 120, "permitido_en_examen": False},
+            {
+                "clave": "lupa",
+                "nombre": "Lupa de Auditor",
+                "descripcion": "Ver trampas",
+                "precio": 60,
+                "permitido_en_examen": False,
+            },
+            {
+                "clave": "abogado",
+                "nombre": "Abogado Senior",
+                "descripcion": "Ver nota",
+                "precio": 90,
+                "permitido_en_examen": False,
+            },
+            {
+                "clave": "amparo",
+                "nombre": "Amparo",
+                "descripcion": "Evita perder vida",
+                "precio": 120,
+                "permitido_en_examen": False,
+            },
         ]
         resp = client.get("/v1/tienda")
         assert resp.status_code == 200
@@ -107,7 +164,14 @@ def test_catalogo_tienda():
 
 def test_comprar_comodin_exito():
     usuario = _crear_usuario(monedas=150)
-    comodin = Comodin(clave=TipoComodin.lupa, nombre="Lupa", descripcion="Lupa", precio=60, permitido_en_examen=False, activo=True)
+    comodin = Comodin(
+        clave=TipoComodin.lupa,
+        nombre="Lupa",
+        descripcion="Lupa",
+        precio=60,
+        permitido_en_examen=False,
+        activo=True,
+    )
 
     sesion_mock = AsyncMock()
     servicio = TiendaServicio(sesion_mock)
@@ -126,7 +190,14 @@ def test_comprar_comodin_exito():
 
 def test_comprar_comodin_saldo_insuficiente():
     usuario = _crear_usuario(monedas=50)
-    comodin = Comodin(clave=TipoComodin.lupa, nombre="Lupa", descripcion="Lupa", precio=60, permitido_en_examen=False, activo=True)
+    comodin = Comodin(
+        clave=TipoComodin.lupa,
+        nombre="Lupa",
+        descripcion="Lupa",
+        precio=60,
+        permitido_en_examen=False,
+        activo=True,
+    )
 
     sesion_mock = AsyncMock()
     servicio = TiendaServicio(sesion_mock)
@@ -156,8 +227,17 @@ def test_comprar_comodin_no_encontrado():
 
 @pytest.mark.asyncio
 async def test_compras_simultaneas_saldo_justo():
-    usuario = _crear_usuario(monedas=60, inventario={"lupa": 0, "abogado": 0, "amparo": 0, "congelar_racha": 0})
-    comodin = Comodin(clave=TipoComodin.lupa, nombre="Lupa", descripcion="Lupa", precio=60, permitido_en_examen=False, activo=True)
+    usuario = _crear_usuario(
+        monedas=60, inventario={"lupa": 0, "abogado": 0, "amparo": 0, "congelar_racha": 0}
+    )
+    comodin = Comodin(
+        clave=TipoComodin.lupa,
+        nombre="Lupa",
+        descripcion="Lupa",
+        precio=60,
+        permitido_en_examen=False,
+        activo=True,
+    )
 
     sesion_mock = AsyncMock()
     servicio = TiendaServicio(sesion_mock)
@@ -175,7 +255,9 @@ async def test_compras_simultaneas_saldo_justo():
 
 
 def test_usar_comodin_amparo():
-    usuario = _crear_usuario(inventario={"lupa": 1, "abogado": 1, "amparo": 1, "congelar_racha": 0}, amparo_activo=False)
+    usuario = _crear_usuario(
+        inventario={"lupa": 1, "abogado": 1, "amparo": 1, "congelar_racha": 0}, amparo_activo=False
+    )
     intento = Intento(
         id=uuid.uuid4(),
         usuario_id=USUARIO_ID_TEST,
@@ -201,7 +283,9 @@ def test_usar_comodin_amparo():
 
 
 def test_usar_comodin_amparo_ya_activo():
-    usuario = _crear_usuario(inventario={"lupa": 1, "abogado": 1, "amparo": 1, "congelar_racha": 0}, amparo_activo=True)
+    usuario = _crear_usuario(
+        inventario={"lupa": 1, "abogado": 1, "amparo": 1, "congelar_racha": 0}, amparo_activo=True
+    )
     intento = Intento(
         id=uuid.uuid4(),
         usuario_id=USUARIO_ID_TEST,
@@ -257,7 +341,9 @@ def test_usar_comodin_lupa():
     servicio._repo.buscar_tarjeta_version = AsyncMock(return_value=tarjeta)
 
     with patch("app.dominios.juego.router.JuegoServicio", return_value=servicio):
-        resp = client.post(f"/v1/intentos/{intento.id}/comodines", json={"comodin": "lupa", "tarjeta_orden": 1})
+        resp = client.post(
+            f"/v1/intentos/{intento.id}/comodines", json={"comodin": "lupa", "tarjeta_orden": 1}
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["comodin"] == "lupa"
@@ -300,7 +386,9 @@ def test_usar_comodin_abogado():
     servicio._repo.buscar_tarjeta_version = AsyncMock(return_value=tarjeta)
 
     with patch("app.dominios.juego.router.JuegoServicio", return_value=servicio):
-        resp = client.post(f"/v1/intentos/{intento.id}/comodines", json={"comodin": "abogado", "tarjeta_orden": 2})
+        resp = client.post(
+            f"/v1/intentos/{intento.id}/comodines", json={"comodin": "abogado", "tarjeta_orden": 2}
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["comodin"] == "abogado"
@@ -317,7 +405,9 @@ def test_usar_comodin_repetido_en_tarjeta():
         sprint_id=1,
         tipo=TipoIntento.sprint,
         estado=EstadoIntento.en_curso,
-        tarjetas_asignadas=[{"orden": 1, "tarjeta_id": str(tid), "version": 1, "comodines": ["lupa"]}],
+        tarjetas_asignadas=[
+            {"orden": 1, "tarjeta_id": str(tid), "version": 1, "comodines": ["lupa"]}
+        ],
     )
 
     sesion_mock = AsyncMock()
@@ -326,7 +416,9 @@ def test_usar_comodin_repetido_en_tarjeta():
     servicio._repo.buscar_intento_por_id_con_lock = AsyncMock(return_value=intento)
 
     with patch("app.dominios.juego.router.JuegoServicio", return_value=servicio):
-        resp = client.post(f"/v1/intentos/{intento.id}/comodines", json={"comodin": "lupa", "tarjeta_orden": 1})
+        resp = client.post(
+            f"/v1/intentos/{intento.id}/comodines", json={"comodin": "lupa", "tarjeta_orden": 1}
+        )
         assert resp.status_code == 409
         assert resp.json()["error"]["codigo"] == "COMODIN_YA_USADO"
 

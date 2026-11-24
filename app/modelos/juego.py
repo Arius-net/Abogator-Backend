@@ -44,9 +44,7 @@ class ProgresoSprint(Base):
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), primary_key=True
     )
-    sprint_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("sprints.id"), primary_key=True
-    )
+    sprint_id: Mapped[int] = mapped_column(Integer, ForeignKey("sprints.id"), primary_key=True)
     estado: Mapped[EstadoProgreso] = mapped_column(
         SAEnum(EstadoProgreso, name="estado_progreso", create_type=False),
         nullable=False,
@@ -55,20 +53,12 @@ class ProgresoSprint(Base):
     estrellas: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
     mejor_aciertos: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
     perfecto: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    completado_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    completado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario", back_populates="progresos", lazy="raise"
-    )
-    sprint: Mapped["Sprint"] = relationship(
-        "Sprint", back_populates="progresos", lazy="raise"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="progresos", lazy="raise")
+    sprint: Mapped["Sprint"] = relationship("Sprint", back_populates="progresos", lazy="raise")
 
-    __table_args__ = (
-        CheckConstraint("estrellas BETWEEN 0 AND 3", name="ck_progreso_estrellas"),
-    )
+    __table_args__ = (CheckConstraint("estrellas BETWEEN 0 AND 3", name="ck_progreso_estrellas"),)
 
 
 class Intento(Base):
@@ -78,9 +68,7 @@ class Intento(Base):
     usuario_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False
     )
-    sprint_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("sprints.id"), nullable=False
-    )
+    sprint_id: Mapped[int] = mapped_column(Integer, ForeignKey("sprints.id"), nullable=False)
     tipo: Mapped[TipoIntento] = mapped_column(
         SAEnum(TipoIntento, name="tipo_intento", create_type=False), nullable=False
     )
@@ -102,29 +90,21 @@ class Intento(Base):
     xp_ganada: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     monedas_ganadas: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    tarjetas_asignadas: Mapped[list[dict[str, Any]] | dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    tarjetas_asignadas: Mapped[list[dict[str, Any]] | dict[str, Any]] = mapped_column(
+        JSONB, nullable=False
+    )
 
-    marcado_revision: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False
-    )
-    pausado_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    marcado_revision: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    pausado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     pausa_acumulada_s: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     iniciado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    terminado_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    terminado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario", back_populates="intentos", lazy="raise"
-    )
-    sprint: Mapped["Sprint"] = relationship(
-        "Sprint", back_populates="intentos", lazy="raise"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="intentos", lazy="raise")
+    sprint: Mapped["Sprint"] = relationship("Sprint", back_populates="intentos", lazy="raise")
     respuestas: Mapped[list["Respuesta"]] = relationship(
         "Respuesta", back_populates="intento", lazy="raise"
     )
@@ -133,25 +113,15 @@ class Intento(Base):
     )
 
     __table_args__ = (
-        CheckConstraint(
-            "ind_presupuesto BETWEEN 0 AND 100", name="ck_intentos_ind_presupuesto"
-        ),
-        CheckConstraint(
-            "ind_reputacion BETWEEN 0 AND 100", name="ck_intentos_ind_reputacion"
-        ),
-        CheckConstraint(
-            "ind_velocidad BETWEEN 0 AND 100", name="ck_intentos_ind_velocidad"
-        ),
-        CheckConstraint(
-            "ind_riesgo BETWEEN 0 AND 100", name="ck_intentos_ind_riesgo"
-        ),
+        CheckConstraint("ind_presupuesto BETWEEN 0 AND 100", name="ck_intentos_ind_presupuesto"),
+        CheckConstraint("ind_reputacion BETWEEN 0 AND 100", name="ck_intentos_ind_reputacion"),
+        CheckConstraint("ind_velocidad BETWEEN 0 AND 100", name="ck_intentos_ind_velocidad"),
+        CheckConstraint("ind_riesgo BETWEEN 0 AND 100", name="ck_intentos_ind_riesgo"),
         CheckConstraint(
             "hp_jefe IS NULL OR hp_jefe BETWEEN 0 AND 100",
             name="ck_intentos_hp_jefe",
         ),
-        CheckConstraint(
-            "pausa_acumulada_s >= 0", name="ck_intentos_pausa_acumulada_s"
-        ),
+        CheckConstraint("pausa_acumulada_s >= 0", name="ck_intentos_pausa_acumulada_s"),
         Index(
             "ix_intentos_en_curso",
             "usuario_id",
@@ -197,26 +167,18 @@ class Respuesta(Base):
     monedas: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     vidas_delta: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
 
-    respondido_en: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    respondido_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     recibido_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
-    intento: Mapped["Intento"] = relationship(
-        "Intento", back_populates="respuestas", lazy="raise"
-    )
-    tarjeta: Mapped["Tarjeta"] = relationship(
-        "Tarjeta", back_populates="respuestas", lazy="raise"
-    )
+    intento: Mapped["Intento"] = relationship("Intento", back_populates="respuestas", lazy="raise")
+    tarjeta: Mapped["Tarjeta"] = relationship("Tarjeta", back_populates="respuestas", lazy="raise")
     apelaciones: Mapped[list["Apelacion"]] = relationship(
         "Apelacion", back_populates="respuesta_origen", lazy="raise"
     )
 
     __table_args__ = (
-        UniqueConstraint(
-            "intento_id", "tarjeta_id", name="uq_respuestas_intento_tarjeta"
-        ),
+        UniqueConstraint("intento_id", "tarjeta_id", name="uq_respuestas_intento_tarjeta"),
         Index("ix_respuestas_intento_id", "intento_id"),
     )

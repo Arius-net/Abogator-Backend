@@ -19,9 +19,7 @@ class TiendaRepositorio:
         return list(res.scalars())
 
     async def buscar_comodin_por_clave(self, clave: str) -> Comodin | None:
-        res = await self._s.execute(
-            select(Comodin).where(Comodin.clave == clave)
-        )
+        res = await self._s.execute(select(Comodin).where(Comodin.clave == clave))
         return res.scalar_one_or_none()
 
     async def buscar_usuario_con_lock(self, usuario_id: uuid.UUID) -> Usuario | None:

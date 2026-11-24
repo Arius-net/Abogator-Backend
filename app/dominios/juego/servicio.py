@@ -51,6 +51,7 @@ from app.esquemas.juego import (
 )
 from app.esquemas.jsonb import Inventario, RetoDiario
 from app.modelos.apelaciones import Apelacion
+from app.modelos.contenido import Tarjeta
 from app.modelos.economia import MovimientoEconomia
 from app.modelos.logros import Certificado
 from app.modelos.enums import (
@@ -98,7 +99,9 @@ class JuegoServicio:
 
         vidas_efectivas, proxima_en = self._calcular_vidas_efectivas(usuario)
         if vidas_efectivas <= 0:
-            raise SinVidas(detalle={"proxima_vida_en": proxima_en.isoformat() if proxima_en else None})
+            raise SinVidas(
+                detalle={"proxima_vida_en": proxima_en.isoformat() if proxima_en else None}
+            )
 
         sprint = await self._repo.buscar_sprint(sprint_id)
         if sprint is None or sprint.es_examen:
@@ -143,12 +146,14 @@ class JuegoServicio:
         paquete_tarjetas: list[PaqueteTarjeta] = []
 
         for idx, t in enumerate(diez_tarjetas, start=1):
-            tarjetas_asignadas.append({
-                "orden": idx,
-                "tarjeta_id": str(t.id),
-                "version": t.version,
-                "comodines": [],
-            })
+            tarjetas_asignadas.append(
+                {
+                    "orden": idx,
+                    "tarjeta_id": str(t.id),
+                    "version": t.version,
+                    "comodines": [],
+                }
+            )
 
             ci = t.contenido_interactivo
             ev_claro = None
@@ -167,8 +172,7 @@ class JuegoServicio:
                     "tipo": mp.get("tipo"),
                     "enunciado": mp.get("enunciado"),
                     "opciones": [
-                        {"id": o["id"], "texto": o["texto"]}
-                        for o in mp.get("opciones", [])
+                        {"id": o["id"], "texto": o["texto"]} for o in mp.get("opciones", [])
                     ],
                 }
 
@@ -181,7 +185,9 @@ class JuegoServicio:
             payload_cifrar = {
                 "veredictos": ci.get("veredictos"),
                 "explicacion": t.explicacion,
-                "lineas_infractoras": ci.get("evidencia", {}).get("lineas_infractoras") if ci.get("evidencia") else None,
+                "lineas_infractoras": ci.get("evidencia", {}).get("lineas_infractoras")
+                if ci.get("evidencia")
+                else None,
                 "opcion_correcta_micro_pregunta": opcion_correcta,
             }
             payload_bytes = json.dumps(payload_cifrar).encode("utf-8")
@@ -242,9 +248,7 @@ class JuegoServicio:
             tarjetas=paquete_tarjetas,
         )
 
-    async def _reconstruir_paquete(
-        self, intento: Intento, usuario: Any
-    ) -> PaqueteSprintRespuesta:
+    async def _reconstruir_paquete(self, intento: Intento, usuario: Any) -> PaqueteSprintRespuesta:
         vidas_efectivas, _ = self._calcular_vidas_efectivas(usuario)
         tarjetas_out: list[PaqueteTarjeta] = []
         for item in intento.tarjetas_asignadas:
@@ -269,8 +273,7 @@ class JuegoServicio:
                     "tipo": mp.get("tipo"),
                     "enunciado": mp.get("enunciado"),
                     "opciones": [
-                        {"id": o["id"], "texto": o["texto"]}
-                        for o in mp.get("opciones", [])
+                        {"id": o["id"], "texto": o["texto"]} for o in mp.get("opciones", [])
                     ],
                 }
             opcion_correcta = None
@@ -282,10 +285,14 @@ class JuegoServicio:
             payload_cifrar = {
                 "veredictos": ci.get("veredictos"),
                 "explicacion": t.explicacion,
-                "lineas_infractoras": ci.get("evidencia", {}).get("lineas_infractoras") if ci.get("evidencia") else None,
+                "lineas_infractoras": ci.get("evidencia", {}).get("lineas_infractoras")
+                if ci.get("evidencia")
+                else None,
                 "opcion_correcta_micro_pregunta": opcion_correcta,
             }
-            cifrado_bytes = cifrar_resolucion(str(intento.id), str(t.id), json.dumps(payload_cifrar).encode("utf-8"))
+            cifrado_bytes = cifrar_resolucion(
+                str(intento.id), str(t.id), json.dumps(payload_cifrar).encode("utf-8")
+            )
             tarjetas_out.append(
                 PaqueteTarjeta(
                     orden=item["orden"],
@@ -507,13 +514,18 @@ class JuegoServicio:
         if res_enum == ResultadoRespuesta.correcto and datos.segundos < cfg.SOSPECHA_SEGUNDOS:
             respuestas_previas = await self._repo.listar_respuestas_intento(intento.id)
             rapidas = sum(
-                1 for r in respuestas_previas
-                if r.resultado == ResultadoRespuesta.correcto and r.segundos and float(r.segundos) < cfg.SOSPECHA_SEGUNDOS
+                1
+                for r in respuestas_previas
+                if r.resultado == ResultadoRespuesta.correcto
+                and r.segundos
+                and float(r.segundos) < cfg.SOSPECHA_SEGUNDOS
             )
             if rapidas + 1 >= cfg.SOSPECHA_MIN_ACIERTOS:
                 intento.marcado_revision = True
 
-        await self._avanzar_reto_diario_respuesta(usuario, res_enum, por_que_ok, datos.lineas_subrayadas)
+        await self._avanzar_reto_diario_respuesta(
+            usuario, res_enum, por_que_ok, datos.lineas_subrayadas
+        )
 
         total_respuestas = await self._repo.contar_respuestas_intento(intento_id) + 1
         cierre = None
@@ -559,7 +571,11 @@ class JuegoServicio:
         )
 
     async def _avanzar_reto_diario_respuesta(
-        self, usuario: Any, resultado: ResultadoRespuesta, por_que_ok: bool, lineas: list[int] | None
+        self,
+        usuario: Any,
+        resultado: ResultadoRespuesta,
+        por_que_ok: bool,
+        lineas: list[int] | None,
     ) -> None:
         try:
             reto = RetoDiario.model_validate(usuario.reto_diario)
@@ -823,7 +839,9 @@ class JuegoServicio:
         usuario = await self._repo.buscar_usuario_con_lock(usuario_id)
         vidas, _ = self._calcular_vidas_efectivas(usuario) if usuario else (5, None)
         total_respuestas = await self._repo.contar_respuestas_intento(intento_id)
-        total_tarjetas = len(intento.tarjetas_asignadas) if isinstance(intento.tarjetas_asignadas, list) else 10
+        total_tarjetas = (
+            len(intento.tarjetas_asignadas) if isinstance(intento.tarjetas_asignadas, list) else 10
+        )
 
         return EstadoIntentoRespuesta(
             id=intento.id,
@@ -900,7 +918,9 @@ class JuegoServicio:
             )
 
         if datos.tarjeta_orden is None:
-            raise PeticionInvalida(detalle={"motivo": "tarjeta_orden es requerido para este comodin."})
+            raise PeticionInvalida(
+                detalle={"motivo": "tarjeta_orden es requerido para este comodin."}
+            )
 
         tarjetas_lista = list(intento.tarjetas_asignadas)
         asignada = None
@@ -950,8 +970,12 @@ class JuegoServicio:
     ) -> DecisionExamen:
         cfg = get_config()
         seg_base = escenario.get("segundos_decision", 15)
-        tiempo_ext = preferencias.get("tiempo_extendido", False) if isinstance(preferencias, dict) else False
-        segundos_limite = float(seg_base * (1.5 if tiempo_ext else 1.0) + cfg.EXAMEN_TOLERANCIA_RED_S)
+        tiempo_ext = (
+            preferencias.get("tiempo_extendido", False) if isinstance(preferencias, dict) else False
+        )
+        segundos_limite = float(
+            seg_base * (1.5 if tiempo_ext else 1.0) + cfg.EXAMEN_TOLERANCIA_RED_S
+        )
 
         ci = tarjeta.contenido_interactivo if tarjeta else {}
         ev_claro = None
@@ -966,7 +990,11 @@ class JuegoServicio:
         t_dict = {
             "id": str(tarjeta.id) if tarjeta else str(item["tarjeta_id"]),
             "version": tarjeta.version if tarjeta else item["version"],
-            "tipo": tarjeta.tipo.value if hasattr(tarjeta.tipo, "value") else str(tarjeta.tipo) if tarjeta else "normal",
+            "tipo": tarjeta.tipo.value
+            if hasattr(tarjeta.tipo, "value")
+            else str(tarjeta.tipo)
+            if tarjeta
+            else "normal",
             "categoria": tarjeta.categoria if tarjeta else "",
             "personaje_nombre": tarjeta.personaje_nombre if tarjeta else "",
             "personaje_rol": tarjeta.personaje_rol if tarjeta else "",
@@ -1133,7 +1161,11 @@ class JuegoServicio:
         sprint = await self._repo.buscar_sprint(intento.sprint_id)
         escenario = sprint.escenario_jefe if sprint and sprint.escenario_jefe else {}
         seg_base = escenario.get("segundos_decision", 15)
-        tiempo_ext = usuario.preferencias.get("tiempo_extendido", False) if isinstance(usuario.preferencias, dict) else False
+        tiempo_ext = (
+            usuario.preferencias.get("tiempo_extendido", False)
+            if isinstance(usuario.preferencias, dict)
+            else False
+        )
         limite_s = (seg_base * (1.5 if tiempo_ext else 1.0)) + cfg.EXAMEN_TOLERANCIA_RED_S
 
         if asignada.get("entregada_en"):
@@ -1280,7 +1312,9 @@ class JuegoServicio:
 
         vidas_efectivas, proxima_en = self._calcular_vidas_efectivas(usuario)
         if vidas_efectivas <= 0:
-            raise SinVidas(detalle={"proxima_vida_en": proxima_en.isoformat() if proxima_en else None})
+            raise SinVidas(
+                detalle={"proxima_vida_en": proxima_en.isoformat() if proxima_en else None}
+            )
 
         sprint = await self._repo.buscar_sprint(sprint_id)
         if sprint is None or not sprint.es_examen:
@@ -1290,7 +1324,9 @@ class JuegoServicio:
         if not escenario or not isinstance(escenario, dict) or not escenario.get("decisiones"):
             raise SprintBloqueado(detalle={"motivo": "escenario_no_cargado"})
 
-        completados = await self._repo.contar_sprints_completados_modulo(usuario_id, sprint.modulo_id)
+        completados = await self._repo.contar_sprints_completados_modulo(
+            usuario_id, sprint.modulo_id
+        )
         if completados < 5:
             raise SprintBloqueado(detalle={"motivo": "sprints_previos_incompletos"})
 
@@ -1320,18 +1356,20 @@ class JuegoServicio:
 
         tarjetas_asignadas: list[dict[str, Any]] = []
         for idx, d in enumerate(decisiones_ordenadas, start=1):
-            tarjetas_asignadas.append({
-                "orden": idx,
-                "tarjeta_id": str(d["tarjeta_id"]),
-                "version": 1,
-                "hora_crisis": d.get("hora_crisis", 0),
-                "replica_jefe": d.get("replica_jefe", ""),
-                "fundamentos": d.get("fundamentos", []),
-                "entregada_en": ahora.isoformat() if idx == 1 else None,
-                "pausa_s": 0,
-                "contra_entregada_en": None,
-                "comodines": [],
-            })
+            tarjetas_asignadas.append(
+                {
+                    "orden": idx,
+                    "tarjeta_id": str(d["tarjeta_id"]),
+                    "version": 1,
+                    "hora_crisis": d.get("hora_crisis", 0),
+                    "replica_jefe": d.get("replica_jefe", ""),
+                    "fundamentos": d.get("fundamentos", []),
+                    "entregada_en": ahora.isoformat() if idx == 1 else None,
+                    "pausa_s": 0,
+                    "contra_entregada_en": None,
+                    "comodines": [],
+                }
+            )
 
         intento = Intento(
             id=datos.id,
@@ -1370,9 +1408,7 @@ class JuegoServicio:
             decision=decision_1,
         )
 
-    async def _reconstruir_examen(
-        self, intento: Intento, usuario: Any
-    ) -> IniciarExamenRespuesta:
+    async def _reconstruir_examen(self, intento: Intento, usuario: Any) -> IniciarExamenRespuesta:
         vidas_efectivas, _ = self._calcular_vidas_efectivas(usuario)
         sprint = await self._repo.buscar_sprint(intento.sprint_id)
         escenario = sprint.escenario_jefe if sprint and sprint.escenario_jefe else {}
@@ -1439,7 +1475,11 @@ class JuegoServicio:
         sprint = await self._repo.buscar_sprint(intento.sprint_id)
         escenario = sprint.escenario_jefe if sprint and sprint.escenario_jefe else {}
         seg_base = escenario.get("segundos_contraargumento", 8)
-        tiempo_ext = usuario.preferencias.get("tiempo_extendido", False) if isinstance(usuario.preferencias, dict) else False
+        tiempo_ext = (
+            usuario.preferencias.get("tiempo_extendido", False)
+            if isinstance(usuario.preferencias, dict)
+            else False
+        )
         limite_s = (seg_base * (1.5 if tiempo_ext else 1.0)) + 2.0
 
         if asignada.get("contra_entregada_en"):
@@ -1489,8 +1529,12 @@ class JuegoServicio:
             sig = next((d for d in tarjetas_lista if d["orden"] == asignada["orden"] + 1), None)
             if sig:
                 sig["entregada_en"] = ahora.isoformat()
-                t_sig = await self._repo.buscar_tarjeta_version(uuid.UUID(sig["tarjeta_id"]), sig["version"])
-                siguiente_decision = self._armar_decision_examen(sig, t_sig, escenario, usuario.preferencias)
+                t_sig = await self._repo.buscar_tarjeta_version(
+                    uuid.UUID(sig["tarjeta_id"]), sig["version"]
+                )
+                siguiente_decision = self._armar_decision_examen(
+                    sig, t_sig, escenario, usuario.preferencias
+                )
             else:
                 if (intento.hp_jefe or 0) > 0:
                     cierre = await self._cerrar_examen_reprobado(intento, usuario, ahora)
@@ -1507,14 +1551,16 @@ class JuegoServicio:
             cierre=cierre,
         )
 
-    async def pausar_examen(
-        self, usuario_id: uuid.UUID, intento_id: uuid.UUID
-    ) -> PausaRespuesta:
+    async def pausar_examen(self, usuario_id: uuid.UUID, intento_id: uuid.UUID) -> PausaRespuesta:
         usuario = await self._repo.buscar_usuario_con_lock(usuario_id)
         if usuario is None:
             raise NoEncontrado()
 
-        tiempo_ext = usuario.preferencias.get("tiempo_extendido", False) if isinstance(usuario.preferencias, dict) else False
+        tiempo_ext = (
+            usuario.preferencias.get("tiempo_extendido", False)
+            if isinstance(usuario.preferencias, dict)
+            else False
+        )
         if not tiempo_ext:
             raise PausaNoPermitida()
 
@@ -1575,7 +1621,9 @@ class JuegoServicio:
         activa = None
         for d in tarjetas_lista:
             if d.get("entregada_en"):
-                resp = await self._repo.buscar_respuesta_por_tarjeta(intento.id, uuid.UUID(d["tarjeta_id"]))
+                resp = await self._repo.buscar_respuesta_por_tarjeta(
+                    intento.id, uuid.UUID(d["tarjeta_id"])
+                )
                 if resp is None:
                     activa = d
                     break
@@ -1589,13 +1637,27 @@ class JuegoServicio:
         intento.tarjetas_asignadas = tarjetas_lista
         await self._s.commit()
 
-        t = await self._repo.buscar_tarjeta_version(uuid.UUID(activa["tarjeta_id"]), activa["version"]) if activa else None
+        t = (
+            await self._repo.buscar_tarjeta_version(
+                uuid.UUID(activa["tarjeta_id"]), activa["version"]
+            )
+            if activa
+            else None
+        )
         decision = self._armar_decision_examen(activa, t, escenario, usuario.preferencias)
 
         seg_base = escenario.get("segundos_decision", 15)
-        tiempo_ext = usuario.preferencias.get("tiempo_extendido", False) if isinstance(usuario.preferencias, dict) else False
+        tiempo_ext = (
+            usuario.preferencias.get("tiempo_extendido", False)
+            if isinstance(usuario.preferencias, dict)
+            else False
+        )
         limite = (seg_base * (1.5 if tiempo_ext else 1.0)) + cfg.EXAMEN_TOLERANCIA_RED_S
-        entregada = datetime.fromisoformat(activa["entregada_en"]) if activa and activa.get("entregada_en") else ahora
+        entregada = (
+            datetime.fromisoformat(activa["entregada_en"])
+            if activa and activa.get("entregada_en")
+            else ahora
+        )
         elapsed = (ahora - entregada).total_seconds() - activa.get("pausa_s", 0)
         restantes = max(0.0, limite - elapsed)
 
